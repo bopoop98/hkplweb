@@ -30,53 +30,14 @@
         .card:hover {
             transform: translateY(-5px);
         }
-        /* Mobile specific styles for table */
+        /* Mobile specific styles for table - REMOVED STACKING RULES */
         @media (max-width: 768px) {
+            /* Ensure table itself doesn't shrink unnecessarily, allowing overflow to work */
             .responsive-table {
-                display: block;
-                width: 100%;
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                min-width: 600px; /* Adjust this value if your table needs more width */
             }
-            .responsive-table thead, .responsive-table tbody, .responsive-table th, .responsive-table td, .responsive-table tr {
-                display: block;
-            }
-            .responsive-table thead tr {
-                position: absolute;
-                top: -9999px;
-                left: -9999px;
-            }
-            .responsive-table tr {
-                border: 1px solid #ccc;
-                margin-bottom: 0.5rem;
-                border-radius: 0.375rem;
-            }
-            .responsive-table td {
-                border: none;
-                border-bottom: 1px solid #eee;
-                position: relative;
-                padding-left: 50% !important; /* Add !important to ensure override */
-                text-align: right;
-                white-space: nowrap;
-            }
-            .responsive-table td:before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0.5rem;
-                width: 45%;
-                padding-right: 0.5rem;
-                white-space: nowrap;
-                text-align: left;
-                font-weight: bold;
-                color: #1e3a8a;
-            }
-            .responsive-table td.team-name-cell { /* Special handling for team name to allow longer text */
-                white-space: normal;
-                text-align: right;
-            }
-             .responsive-table td.team-name-cell:before {
-                white-space: nowrap;
-            }
+            /* Removed rules like display: block for tr, td, th, etc. */
+            /* Removed content: attr(data-label) for td:before */
         }
         /* Language button styling */
         .lang-button {
@@ -88,7 +49,6 @@
         .lang-button:not(.active) {
             @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
         }
-        /* Removed new styling for Top Scorers List */
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     
