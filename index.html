@@ -20,6 +20,7 @@
             margin-bottom: 1rem;
             color: #1e3a8a;
         }
+        /* General card styling (used for individual scorer cards now) */
         .card {
             background-color: white;
             border-radius: 0.5rem;
@@ -28,13 +29,6 @@
         }
         .card:hover {
             transform: translateY(-5px);
-        }
-        .match-date-header {
-            background-color: #e0e7ff; /* Light indigo */
-            color: #3730a3; /* Indigo */
-            font-weight: bold;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
         }
         /* Mobile specific styles for table */
         @media (max-width: 768px) {
@@ -84,65 +78,79 @@
                 white-space: nowrap;
             }
         }
+        /* Language button styling */
+        .lang-button {
+            @apply px-3 py-1 rounded-full text-sm font-semibold transition-colors duration-200;
+        }
+        .lang-button.active {
+            @apply bg-blue-700 text-white shadow-md font-bold;
+        }
+        .lang-button:not(.active) {
+            @apply bg-gray-200 text-gray-700 hover:bg-gray-300;
+        }
+        /* Removed new styling for Top Scorers List */
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
 </head>
 <body class="bg-gray-100 text-gray-800 p-4 md:p-8">
 
     <div class="container mx-auto max-w-4xl">
 
-        <header class="mb-8 text-center">
-            <h1 class="text-4xl font-bold text-blue-700">Local Football League</h1>
+        <header class="mb-8 text-left flex justify-between items-center"> <h1 class="text-6xl font-bold text-blue-700" id="main-title">Local Football League</h1>
+            <div class="flex space-x-2">
+                <button id="lang-en" class="lang-button active" data-lang="en">EN</button>
+                <button id="lang-my" class="lang-button" data-lang="my">မြန်မာ</button> </div>
         </header>
 
+        <section id="upcoming-matches" class="mb-12">
+            <h2 class="text-2xl font-semibold mb-1 section-title" data-key="upcomingMatchesTitle">Upcoming Matches This Week</h2>
+            <div id="matches-list" class="space-y-3">
+                <p class="text-gray-600 text-center" data-key="loadingMatches">Loading matches...</p>
+            </div>
+        </section>
+
         <section id="league-standings" class="mb-12">
-            <h2 class="text-2xl font-semibold mb-4 section-title">League Standings</h2>
+            <h2 class="text-2xl font-semibold mb-4 section-title" data-key="leagueStandingsTitle">League Standings</h2>
             <div class="overflow-x-auto shadow-md rounded-lg">
                 <table class="min-w-full bg-white responsive-table">
                     <thead class="table-header">
                         <tr>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">Pos</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">Team</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">P</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">W</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">D</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">L</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">GF</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">GA</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">GD</th>
-                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider">Pts</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="posHeader">Pos</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="teamHeader">Team</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="pHeader">P</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="wHeader">W</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="dHeader">D</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="lHeader">L</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="gfHeader">GF</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="gaHeader">GA</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="gdHeader">GD</th>
+                            <th class="p-3 text-left text-xs font-medium uppercase tracking-wider" data-key="ptsHeader">Pts</th>
                         </tr>
                     </thead>
                     <tbody id="standings-body" class="divide-y divide-gray-200">
-                        </tbody>
+                        <tr><td colspan="10" class="text-gray-600 text-center p-4" data-key="loadingStandings">Loading standings...</td></tr>
+                    </tbody>
                 </table>
             </div>
         </section>
 
         <section id="top-scorers" class="mb-12">
-            <h2 class="text-2xl font-semibold mb-6 section-title">Top Scorers</h2>
-            <div id="scorers-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                </div>
-        </section>
-
-        <section id="upcoming-matches">
-            <h2 class="text-2xl font-semibold mb-1 section-title">Upcoming Matches This Week</h2>
-            <div id="matches-list" class="space-y-6">
-                </div>
+            <h2 class="text-2xl font-semibold mb-6 section-title" data-key="topScorersTitle">Top Scorers</h2>
+            <div id="scorers-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> <p class="text-gray-600 text-center col-span-full" data-key="loadingScorers">Loading top scorers...</p>
+            </div>
         </section>
 
         <footer class="mt-12 text-center text-sm text-gray-500">
-            <p>&copy; <span id="current-year"></span> Local Football League. All rights reserved.</p>
-            <p>Data last updated: <span id="data-last-updated"></span></p>
+            <p>&copy; <span id="current-year"></span> <span data-key="footerLeagueName">Local Football League</span>. <span data-key="footerRights">All rights reserved.</span></p>
+            <p><span data-key="dataLastUpdatedPrefix">Data last updated:</span> <span id="data-last-updated"></span></p>
         </footer>
     </div>
 
     <script>
         // --- DATA ---
-        // In a real application, you would fetch this from a data.json file or an API.
-        // For this example, it's embedded.
         const leagueData = {
-            lastUpdated: "2025-05-31T10:00:00Z", // ISO 8601 format
+            lastUpdated: "2025-06-01T10:00:00Z", // ISO 8601 format
             teams: [
                 { id: 1, name: "Dragons FC", logo: "https://placehold.co/40x40/FF5733/FFFFFF?text=DFC", played: 5, won: 4, drawn: 1, lost: 0, gf: 12, ga: 3, pts: 13 },
                 { id: 2, name: "Valley Rovers", logo: "https://placehold.co/40x40/33FF57/FFFFFF?text=VR", played: 5, won: 3, drawn: 1, lost: 1, gf: 10, ga: 5, pts: 10 },
@@ -155,40 +163,166 @@
                 { id: 9, name: "Parkside Rangers", logo: "https://placehold.co/40x40/3498DB/FFFFFF?text=PR", played: 5, won: 0, drawn: 3, lost: 2, gf: 3, ga: 6, pts: 3 },
                 { id: 10, name: "Union FC", logo: "https://placehold.co/40x40/8E44AD/FFFFFF?text=UFC", played: 5, won: 0, drawn: 2, lost: 3, gf: 2, ga: 8, pts: 2 },
             ],
-            topScorers: [ // Only top 5
+            topScorers: [
                 { playerId: 101, playerName: "Alex Stone", playerImage: "https://placehold.co/80x80/FF5733/FFFFFF?text=AS", teamId: 1, matchesPlayed: 5, goals: 7, assists: 2 },
                 { playerId: 102, playerName: "Maria Lin", playerImage: "https://placehold.co/80x80/33FF57/FFFFFF?text=ML", teamId: 2, matchesPlayed: 5, goals: 5, assists: 3 },
                 { playerId: 103, playerName: "Kenji Tanaka", playerImage: "https://placehold.co/80x80/3357FF/FFFFFF?text=KT", teamId: 3, matchesPlayed: 4, goals: 4, assists: 1 },
                 { playerId: 104, playerName: "Sarah Woods", playerImage: "https://placehold.co/80x80/FF33A1/FFFFFF?text=SW", teamId: 1, matchesPlayed: 5, goals: 4, assists: 4 },
                 { playerId: 105, playerName: "David Miller", playerImage: "https://placehold.co/80x80/F1C40F/FFFFFF?text=DM", teamId: 4, matchesPlayed: 5, goals: 3, assists: 2 },
+                { playerId: 106, playerName: "Emily White", playerImage: "https://placehold.co/80x80/9B59B6/FFFFFF?text=EW", teamId: 5, matchesPlayed: 5, goals: 3, assists: 1 },
+                { playerId: 107, playerName: "Chris Green", playerImage: "https://placehold.co/80x80/1ABC9C/FFFFFF?text=CG", teamId: 6, matchesPlayed: 5, goals: 2, assists: 3 }
             ],
-            upcomingMatches: [ // Matches for the current week (adjust dates as needed for testing)
-                // Example: if today is June 1, 2025 (Sunday)
-                { matchId: 201, date: "2025-06-01", time: "15:00", team1Id: 1, team2Id: 2 }, // Sunday
-                { matchId: 202, date: "2025-06-01", time: "17:00", team1Id: 3, team2Id: 4 }, // Sunday
-                { matchId: 203, date: "2025-06-07", time: "14:00", team1Id: 5, team2Id: 6 }, // Next Saturday
-                { matchId: 204, date: "2025-06-07", time: "16:00", team1Id: 7, team2Id: 8 }, // Next Saturday
-                { matchId: 205, date: "2025-06-08", time: "15:00", team1Id: 9, team2Id: 10 },// Next Sunday
-                { matchId: 206, date: "2025-06-14", time: "15:00", team1Id: 1, team2Id: 3 }, // Week after next
+            upcomingMatches: [
+                { matchId: 201, date: "2025-06-01", time: "15:00", team1Id: 1, team2Id: 2, score: "2 - 1" }, 
+                { matchId: 202, date: "2025-06-01", time: "17:00", team1Id: 3, team2Id: 4, score: "0 - 0" }, 
+                { matchId: 203, date: "2025-06-07", time: "14:00", team1Id: 5, team2Id: 6, score: "0 - 0" }, 
+                { matchId: 204, date: "2025-06-07", time: "16:00", team1Id: 7, team2Id: 8, score: "0 - 0" }, 
+                { matchId: 205, date: "2025-06-08", time: "15:00", team1Id: 9, team2Id: 10, score: "0 - 0" },
+                { matchId: 206, date: "2025-06-14", time: "15:00", team1Id: 1, team2Id: 3, score: "0 - 0" }, 
             ]
         };
 
+        // --- LANGUAGE TRANSLATIONS ---
+        const translations = {
+            en: {
+                mainTitle: "Local Football League",
+                upcomingMatchesTitle: "Upcoming Matches This Week",
+                loadingMatches: "Loading matches...",
+                noUpcomingMatches: "No upcoming matches scheduled for this week.",
+                live: "LIVE",
+                ft: "FT",
+                leagueStandingsTitle: "League Standings",
+                loadingStandings: "Loading standings...",
+                noStandingsData: "No standings data available.",
+                posHeader: "Pos",
+                teamHeader: "Team",
+                pHeader: "P",
+                wHeader: "W",
+                dHeader: "D",
+                lHeader: "L",
+                gfHeader: "GF",
+                gaHeader: "GA",
+                gdHeader: "GD",
+                ptsHeader: "Pts",
+                topScorersTitle: "Top Scorers",
+                loadingScorers: "Loading top scorers...",
+                noScorersData: "No top scorers data available.",
+                mp: "MP",
+                g: "G",
+                a: "A",
+                vs: "vs",
+                footerLeagueName: "Local Football League",
+                footerRights: "All rights reserved.",
+                dataLastUpdatedPrefix: "Data last updated:"
+            },
+            my: { // Myanmar translations (simplified for example)
+                mainTitle: "ပြည်တွင်းဘောလုံးလိဂ်",
+                upcomingMatchesTitle: "လာမည့်ပွဲစဉ်များ",
+                loadingMatches: "ပွဲစဉ်များ တင်နေသည်...",
+                noUpcomingMatches: "ယခုသီတင်းပတ်အတွက် လာမည့်ပွဲစဉ်များ မရှိပါ။",
+                live: "တိုက်ရိုက်",
+                ft: "ပွဲပြီး",
+                leagueStandingsTitle: "လိဂ်ရပ်တည်မှု",
+                loadingStandings: "ရပ်တည်မှုများ တင်နေသည်...",
+                noStandingsData: "ရပ်တည်မှုဒေတာ မရှိပါ။",
+                posHeader: "အဆင့်",
+                teamHeader: "အသင်း",
+                pHeader: "ပွဲ",
+                wHeader: "နိုင်",
+                dHeader: "သရေ",
+                lHeader: "ရှုံး",
+                gfHeader: "သွင်း",
+                gaHeader: "ပေး",
+                gdHeader: "ဂိုးကွာ",
+                ptsHeader: "ရမှတ်",
+                topScorersTitle: "ဂိုးသွင်းအများဆုံးများ",
+                loadingScorers: "ဂိုးသွင်းအများဆုံးများ တင်နေသည်...",
+                noScorersData: "ဂိုးသွင်းအများဆုံးဒေတာ မရှိပါ။",
+                mp: "ပွဲ",
+                g: "ဂိုး",
+                a: "ဖန်",
+                vs: "နှင့်",
+                footerLeagueName: "ပြည်တွင်းဘောလုံးလိဂ်",
+                footerRights: "အခွင့်အရေးများအားလုံး ကာကွယ်ထားပါသည်။",
+                dataLastUpdatedPrefix: "ဒေတာ နောက်ဆုံးအပ်ဒိတ်လုပ်သည်:"
+            }
+        };
+
+        let currentLanguage = localStorage.getItem('preferredLanguage') || 'en'; // Default to English
+
+        // --- LANGUAGE SWITCHER FUNCTION ---
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('preferredLanguage', lang); // Save preference
+
+            // Update all elements with data-key attribute
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+
+            // Update specific elements not covered by data-key
+            document.getElementById('main-title').textContent = translations[lang].mainTitle;
+
+            // Re-render dynamic content to apply new language to fetched data
+            renderUpcomingMatches();
+            renderStandings();
+            renderTopScorers();
+            updateFooter(); // Update footer with new language prefix
+            
+            // Update active button styling
+            document.querySelectorAll('.lang-button').forEach(button => {
+                if (button.dataset.lang === lang) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
         // --- UTILITY FUNCTIONS ---
         function getTeamById(teamId) {
-            return leagueData.teams.find(team => team.id === teamId);
+            if (!leagueData.teams) return null; 
+            return leagueData.teams.find(team => String(team.id) === String(teamId));
         }
 
-        function formatDateForDisplay(dateString) {
-            const date = new Date(dateString + 'T00:00:00'); // Ensure it's parsed as local date
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            return date.toLocaleDateString(undefined, options);
-        }
+        /**
+         * Determines the status of a match (upcoming, ongoing, finished) and returns
+         * a display string based on that status.
+         * @param {object} match - The match object from leagueData.upcomingMatches.
+         * @returns {{status: string, display: string, scoreDisplay?: string}} An object
+         * containing the match status and the string to display.
+         */
+        function getMatchStatusAndDisplay(match) {
+            const MATCH_DURATION_MINUTES = 90; // Standard football match duration
+            const matchDateTime = new Date(`${match.date}T${match.time}:00`); // Combine date and time
+            const now = new Date();
+            const matchEndTime = new Date(matchDateTime.getTime() + (MATCH_DURATION_MINUTES * 60 * 1000));
 
-         function formatTimeForDisplay(timeString) { // "HH:MM"
-            const [hours, minutes] = timeString.split(':');
-            const date = new Date();
-            date.setHours(parseInt(hours), parseInt(minutes), 0);
-            return date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+            const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+            const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
+
+            if (now >= matchDateTime && now <= matchEndTime) {
+                return {
+                    status: 'ongoing',
+                    display: translations[currentLanguage].live, // Use translated "LIVE"
+                    scoreDisplay: match.score || '0 - 0' 
+                };
+            } else if (now < matchDateTime) {
+                const displayDateTime = `${matchDateTime.toLocaleDateString(undefined, dateOptions)} ${matchDateTime.toLocaleTimeString(undefined, timeOptions)}`;
+                return {
+                    status: 'upcoming',
+                    display: displayDateTime
+                };
+            } else {
+                return {
+                    status: 'finished',
+                    display: translations[currentLanguage].ft, // Use translated "FT"
+                    scoreDisplay: match.score || '0 - 0' 
+                };
+            }
         }
 
 
@@ -200,7 +334,11 @@
             if (!standingsBody) return;
             standingsBody.innerHTML = ''; // Clear existing
 
-            // Sort teams by points, then GD, then GF
+            if (leagueData.teams.length === 0) {
+                 standingsBody.innerHTML = `<tr><td colspan="10" class="text-gray-600 text-center p-4">${translations[currentLanguage].noStandingsData}</td></tr>`;
+                 return;
+            }
+
             const sortedTeams = [...leagueData.teams].sort((a, b) => {
                 if (b.pts !== a.pts) return b.pts - a.pts;
                 const gdA = a.gf - a.ga;
@@ -213,49 +351,55 @@
                 const row = standingsBody.insertRow();
                 const gd = team.gf - team.ga;
                 row.innerHTML = `
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="Pos">${index + 1}</td>
-                    <td class="p-3 text-sm text-gray-900 font-medium team-name-cell" data-label="Team">
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].posHeader}">${index + 1}</td>
+                    <td class="p-3 text-sm text-gray-900 font-medium team-name-cell" data-label="${translations[currentLanguage].teamHeader}">
                         <div class="flex items-center">
                             <img src="${team.logo}" alt="${team.name} logo" class="w-6 h-6 mr-2 rounded-full" onerror="this.style.display='none'">
                             ${team.name}
                         </div>
                     </td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="P">${team.played}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="W">${team.won}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="D">${team.drawn}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="L">${team.lost}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="GF">${team.gf}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="GA">${team.ga}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="GD">${gd > 0 ? '+' : ''}${gd}</td>
-                    <td class="p-3 text-sm text-gray-900 font-bold whitespace-nowrap" data-label="Pts">${team.pts}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].pHeader}">${team.played}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].wHeader}">${team.won}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].dHeader}">${team.drawn}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].lHeader}">${team.lost}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gfHeader}">${team.gf}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gaHeader}">${team.ga}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gdHeader}">${gd > 0 ? '+' : ''}${gd}</td>
+                    <td class="p-3 text-sm text-gray-900 font-bold whitespace-nowrap" data-label="${translations[currentLanguage].ptsHeader}">${team.pts}</td>
                 `;
             });
         }
 
-        // 2. Render Top Scorers
+        // 2. Render Top Scorers (REVERTED TO ORIGINAL GRID DESIGN)
         function renderTopScorers() {
-            const scorersGrid = document.getElementById('scorers-grid');
+            const scorersGrid = document.getElementById('scorers-grid'); // Reverted ID here
             if (!scorersGrid) return;
             scorersGrid.innerHTML = ''; // Clear existing
 
-            // Sort by goals, then assists
+            if (leagueData.topScorers.length === 0) {
+                scorersGrid.innerHTML = `<p class="text-gray-600 text-center col-span-full">${translations[currentLanguage].noScorersData}</p>`;
+                return;
+            }
+
+            // Sort by goals, then assists, and slice to get only top 5
             const sortedScorers = [...leagueData.topScorers].sort((a,b) => {
                 if (b.goals !== a.goals) return b.goals - a.goals;
                 return b.assists - a.assists;
-            }).slice(0, 5); // Ensure only top 5
+            }).slice(0, 5); // Limit to top 5
 
             sortedScorers.forEach(scorer => {
                 const team = getTeamById(scorer.teamId);
                 const card = document.createElement('div');
-                card.className = 'card p-4 flex flex-col items-center text-center';
+                // Reverted to original card class names
+                card.className = 'card p-4 flex flex-col items-center text-center'; 
                 card.innerHTML = `
                     <img src="${scorer.playerImage}" alt="${scorer.playerName}" class="w-20 h-20 rounded-full mb-3 object-cover shadow-lg" onerror="this.src='https://placehold.co/80x80/CCCCCC/FFFFFF?text=N/A';">
                     <h3 class="text-lg font-semibold text-blue-600">${scorer.playerName}</h3>
                     <p class="text-sm text-gray-600">${team ? team.name : 'N/A'}</p>
                     <div class="mt-2 text-xs text-gray-500">
-                        <span>MP: ${scorer.matchesPlayed}</span> |
-                        <span class="font-bold text-green-600">G: ${scorer.goals}</span> |
-                        <span>A: ${scorer.assists}</span>
+                        <span>${translations[currentLanguage].mp}: ${scorer.matchesPlayed}</span> |
+                        <span class="font-bold text-green-600">${translations[currentLanguage].g}: ${scorer.goals}</span> |
+                        <span>${translations[currentLanguage].a}: ${scorer.assists}</span>
                     </div>
                 `;
                 scorersGrid.appendChild(card);
@@ -269,25 +413,20 @@
             matchesListDiv.innerHTML = '';
 
             const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normalize to start of day
+            today.setHours(0, 0, 0, 0);
 
-            const currentDayOfWeek = today.getDay(); // 0 (Sun) - 6 (Sat)
-            
-            // Calculate start of the week (assuming week starts on Sunday)
+            const currentDayOfWeek = today.getDay();
             const startOfWeek = new Date(today);
             startOfWeek.setDate(today.getDate() - currentDayOfWeek);
-
-            // Calculate end of the week (Saturday)
             const endOfWeek = new Date(startOfWeek);
             endOfWeek.setDate(startOfWeek.getDate() + 6);
-            endOfWeek.setHours(23,59,59,999); // End of Saturday
+            endOfWeek.setHours(23,59,59,999);
 
             const matchesThisWeek = leagueData.upcomingMatches.filter(match => {
-                const matchDate = new Date(match.date + 'T00:00:00'); // Ensure parsed as local
+                const matchDate = new Date(match.date + 'T00:00:00');
                 return matchDate >= startOfWeek && matchDate <= endOfWeek;
             });
             
-            // Sort matches by date and then by time
             matchesThisWeek.sort((a,b) => {
                 const dateA = new Date(a.date + 'T' + a.time);
                 const dateB = new Date(b.date + 'T' + b.time);
@@ -295,49 +434,49 @@
             });
 
             if (matchesThisWeek.length === 0) {
-                matchesListDiv.innerHTML = '<p class="text-gray-600 text-center">No upcoming matches scheduled for this week.</p>';
+                matchesListDiv.innerHTML = `<p class="text-gray-600 text-center">${translations[currentLanguage].noUpcomingMatches}</p>`;
                 return;
             }
 
-            // Group matches by date
-            const matchesByDate = matchesThisWeek.reduce((acc, match) => {
-                const dateStr = formatDateForDisplay(match.date);
-                if (!acc[dateStr]) {
-                    acc[dateStr] = [];
-                }
-                acc[dateStr].push(match);
-                return acc;
-            }, {});
+            const ul = document.createElement('ul');
+            ul.className = 'space-y-2 bg-white p-4 rounded-lg shadow';
 
-            for (const dateStr in matchesByDate) {
-                const dateMatches = matchesByDate[dateStr];
+            matchesThisWeek.forEach(match => {
+                const team1 = getTeamById(match.team1Id);
+                const team2 = getTeamById(match.team2Id);
                 
-                const dateHeader = document.createElement('h3');
-                dateHeader.className = 'text-lg font-semibold mt-4 mb-2 match-date-header';
-                dateHeader.textContent = dateStr;
-                matchesListDiv.appendChild(dateHeader);
+                const matchInfo = getMatchStatusAndDisplay(match);
 
-                const ul = document.createElement('ul');
-                ul.className = 'space-y-3 bg-white p-4 rounded-lg shadow';
-                dateMatches.forEach(match => {
-                    const team1 = getTeamById(match.team1Id);
-                    const team2 = getTeamById(match.team2Id);
-                    const li = document.createElement('li');
-                    li.className = 'flex justify-between items-center p-3 rounded-md hover:bg-gray-50 transition-colors';
-                    li.innerHTML = `
-                        <div class="flex items-center space-x-2">
-                            <img src="${team1.logo}" alt="${team1.name}" class="w-5 h-5 rounded-full" onerror="this.style.display='none'"/>
-                            <span class="font-medium text-gray-700">${team1 ? team1.name : 'N/A'}</span>
-                            <span class="text-gray-500">vs</span>
-                            <img src="${team2.logo}" alt="${team2.name}" class="w-5 h-5 rounded-full" onerror="this.style.display='none'"/>
-                            <span class="font-medium text-gray-700">${team2 ? team2.name : 'N/A'}</span>
-                        </div>
-                        <span class="text-sm text-blue-600 font-semibold">${formatTimeForDisplay(match.time)}</span>
-                    `;
-                    ul.appendChild(li);
-                });
-                matchesListDiv.appendChild(ul);
-            }
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-2 rounded-md hover:bg-gray-50 transition-colors';
+                
+                if (matchInfo.status === 'ongoing') {
+                    li.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
+                }
+
+                li.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <img src="${team1 ? team1.logo : ''}" alt="${team1 ? team1.name : 'N/A'}" class="w-5 h-5 rounded-full" onerror="this.style.display='none'"/>
+                        <span class="font-medium text-gray-700">${team1 ? team1.name : 'N/A'}</span>
+                        <span class="text-gray-500">${translations[currentLanguage].vs}</span>
+                        <img src="${team2 ? team2.logo : ''}" alt="${team2 ? team2.name : 'N/A'}" class="w-5 h-5 rounded-full" onerror="this.style.display='none'"/>
+                        <span class="font-medium text-gray-700">${team2 ? team2.name : 'N/A'}</span>
+                    </div>
+                    <div class="text-right">
+                        ${matchInfo.status === 'ongoing' ?
+                            `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">${translations[currentLanguage].live}</span>
+                             <span class="ml-2 text-lg font-bold text-blue-700">${matchInfo.scoreDisplay}</span>`
+                            : matchInfo.status === 'finished' ?
+                            `<span class="text-sm text-gray-500 font-semibold">${translations[currentLanguage].ft}</span>
+                             <span class="ml-1 text-base font-bold text-gray-800">${matchInfo.scoreDisplay}</span>`
+                            :
+                            `<span class="text-sm text-blue-600 font-semibold">${matchInfo.display}</span>`
+                        }
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+            matchesListDiv.appendChild(ul);
         }
         
         // --- FOOTER ---
@@ -359,9 +498,17 @@
 
         // --- INITIALIZE PAGE ---
         document.addEventListener('DOMContentLoaded', () => {
-            renderStandings();
-            renderTopScorers();
-            renderUpcomingMatches();
+            // Set initial language based on localStorage or default
+            setLanguage(currentLanguage);
+
+            // Add event listeners for language buttons
+            document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
+            document.getElementById('lang-my').addEventListener('click', () => setLanguage('my'));
+
+            // Initial render of all sections with static data
+            renderUpcomingMatches(); 
+            renderStandings();       
+            renderTopScorers();      
             updateFooter();
         });
 
