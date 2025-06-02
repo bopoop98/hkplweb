@@ -261,7 +261,7 @@
         <section id="league-standings" class="mt-8">
             <h2 class="section-title mb-4" data-key="leagueStandingsTitle">League Standings</h2>
             <div class="overflow-x-auto bg-white rounded-lg shadow">
-                <table class="min-w-full responsive-table">
+                <table class="min-w-full">
                     <thead class="table-header">
                         <tr>
                             <th class="p-3 text-sm" data-key="posHeader">Pos</th>
@@ -637,31 +637,41 @@
             });
             matchesListDiv.appendChild(ul);
         }
-        
+
         // --- FOOTER ---
         function updateFooter() {
-    const yearSpan = document.getElementById('current-year');
-    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+            const yearSpan = document.getElementById('current-year');
+            if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-    const lastUpdatedSpan = document.getElementById('data-last-updated');
-    if (lastUpdatedSpan && lastUpdatedTimestamp) {
-        const lastUpdateDate = new Date(lastUpdatedTimestamp);
-         lastUpdatedSpan.textContent = lastUpdateDate.toLocaleDateString(undefined, {
-            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-        });
-        // TEMPORARY DEBUGGING LINE: Change background to clearly see if this block executes
-        lastUpdatedSpan.style.backgroundColor = 'yellow';
-        lastUpdatedSpan.style.padding = '2px 5px';
-        lastUpdatedSpan.style.borderRadius = '3px';
+            const lastUpdatedSpan = document.getElementById('data-last-updated');
 
-    } else if (lastUpdatedSpan) {
-        lastUpdatedSpan.textContent = "Not available";
-        // TEMPORARY DEBUGGING LINE: Change background to clearly see if this block executes
-        lastUpdatedSpan.style.backgroundColor = 'lightgray';
-        lastUpdatedSpan.style.padding = '2px 5px';
-        lastUpdatedSpan.style.borderRadius = '3px';
-    }
-}
+            // Log the variables at the start of the function
+            console.log('updateFooter called:');
+            console.log('  lastUpdatedSpan element:', lastUpdatedSpan);
+            console.log('  lastUpdatedTimestamp value:', lastUpdatedTimestamp);
+
+            if (lastUpdatedSpan) { // Check if the span element was found
+                if (lastUpdatedTimestamp) { // Check if the timestamp is present
+                    const lastUpdateDate = new Date(lastUpdatedTimestamp);
+                    lastUpdatedSpan.textContent = `Data last updated: ${lastUpdateDate.toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}`;
+                    lastUpdatedSpan.style.backgroundColor = 'yellow'; // Diagnostic color
+                    lastUpdatedSpan.style.padding = '2px 5px';
+                    lastUpdatedSpan.style.borderRadius = '3px';
+                    console.log('  Footer: Date applied and background set to yellow.');
+                } else { // Timestamp is null or undefined
+                    lastUpdatedSpan.textContent = "Data last updated: Not available (Timestamp null)";
+                    lastUpdatedSpan.style.backgroundColor = 'lightgray'; // Diagnostic color
+                    lastUpdatedSpan.style.padding = '2px 5px';
+                    lastUpdatedSpan.style.borderRadius = '3px';
+                    console.log('  Footer: Not available applied and background set to lightgray.');
+                }
+            } else { // The span element was NOT found
+                console.warn('  Footer: Element with ID "data-last-updated" not found in the DOM!');
+            }
+        }
+        
         // --- UI VISIBILITY FUNCTIONS ---
         function showSection(sectionId) {
             document.querySelectorAll('section').forEach(section => {
