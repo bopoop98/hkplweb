@@ -39,31 +39,28 @@
         background-color: #1e3a8a; /* Dark blue */
         color: white;
     }
-        /* General Table Styling - Reverted/Adjusted */
-    .standings-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed; /* Keep fixed layout for consistent columns */
-    }
+        
+    /* General table cell styles - ensure these are present */
     .standings-table th, .standings-table td {
         padding: 0.75rem 0.5rem;
         text-align: center;
         border-bottom: 1px solid #e2e8f0;
         overflow: hidden; /* Important for ellipsis */
-        white-space: nowrap; /* Keep text on one line by default */
-        text-overflow: ellipsis; /* Add ellipsis for overflow */
+        white-space: nowrap; /* Default: keep text on one line for all cells */
+        text-overflow: ellipsis; /* Default: add ellipsis for overflow */
     }
     .standings-table td:first-child,
     .standings-table th:first-child {
-        text-align: left; /* Align first column (Position) to left */
+        text-align: left;
     }
-    /* Team Name column (2nd child) - Default for larger screens (>770px) */
+
+    /* Team Name column (2nd child) - Default for larger screens (>769px) */
     .standings-table td:nth-child(2) {
-        text-align: left; /* Align team names to the left */
-        /* On larger screens, no specific max-width, let it expand naturally */
-        white-space: normal; /* Allow wrapping on larger screens by default */
+        text-align: left;
+        white-space: normal; /* Allow wrapping on larger screens */
         overflow: visible;   /* No hidden overflow on larger screens */
         text-overflow: clip; /* No ellipsis on larger screens */
+        /* Ensure no conflicting max-width here for larger screens */
     }
 
     /* Mobile specific styles for table - Truncation for Team Name below 770px */
@@ -72,13 +69,11 @@
             white-space: nowrap;        /* Force text to stay on one line */
             overflow: hidden;           /* Hide overflowing content */
             text-overflow: ellipsis;    /* Add "..." for overflow */
-            max-width: 15ch;            /* Limit width to approx. 15 characters, adjust as needed */
-                                        /* 15ch is a starting point, adjust if names are still too long or short */
+            max-width: 20ch;            /* Limit width to approx. 20 characters before ellipsis */
         }
-        /* Keep any other mobile-specific rules you had, e.g., for stacking if desired */
-        /* If you had the full stacking rules (display: block, etc.) from the previous response,
-           and you want to revert them, you should remove them here. */
-        /* If you want the horizontal scroll only, do not use stacking rules below 769px. */
+        /* IMPORTANT: Ensure there are NO other @media (max-width: 769px) rules for .standings-table
+           or .responsive-table that apply `display: block;` to table rows/cells.
+           Those are the stacking rules you want to avoid. */
     }
 
         .section-title {
@@ -645,30 +640,16 @@
 
             const lastUpdatedSpan = document.getElementById('data-last-updated');
 
-            // Log the variables at the start of the function
-            console.log('updateFooter called:');
-            console.log('  lastUpdatedSpan element:', lastUpdatedSpan);
-            console.log('  lastUpdatedTimestamp value:', lastUpdatedTimestamp);
+            console.log('updateFooter called.');
+            console.log('  lastUpdatedSpan element (should not be null):', lastUpdatedSpan); // CRITICAL: What does this log?
+            console.log('  lastUpdatedTimestamp value (from Firebase):', lastUpdatedTimestamp); // CRITICAL: What does this log?
 
-            if (lastUpdatedSpan) { // Check if the span element was found
-                if (lastUpdatedTimestamp) { // Check if the timestamp is present
-                    const lastUpdateDate = new Date(lastUpdatedTimestamp);
-                    lastUpdatedSpan.textContent = `Data last updated: ${lastUpdateDate.toLocaleDateString(undefined, {
-                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                    })}`;
-                    lastUpdatedSpan.style.backgroundColor = 'yellow'; // Diagnostic color
-                    lastUpdatedSpan.style.padding = '2px 5px';
-                    lastUpdatedSpan.style.borderRadius = '3px';
-                    console.log('  Footer: Date applied and background set to yellow.');
-                } else { // Timestamp is null or undefined
-                    lastUpdatedSpan.textContent = "Data last updated: Not available (Timestamp null)";
-                    lastUpdatedSpan.style.backgroundColor = 'lightgray'; // Diagnostic color
-                    lastUpdatedSpan.style.padding = '2px 5px';
-                    lastUpdatedSpan.style.borderRadius = '3px';
-                    console.log('  Footer: Not available applied and background set to lightgray.');
-                }
-            } else { // The span element was NOT found
-                console.warn('  Footer: Element with ID "data-last-updated" not found in the DOM!');
+            if (lastUpdatedSpan) { // If the span element IS found
+                lastUpdatedSpan.textContent = "DEBUG: SPAN FOUND!"; // Simple text to confirm it's found
+                lastUpdatedSpan.style.backgroundColor = 'purple'; // Very obvious color
+                console.log('  Footer: Span found and set to purple.');
+            } else { // If the span element is NOT found
+                console.log('  Footer: ERROR - "data-last-updated" span was NOT found in DOM!');
             }
         }
         
