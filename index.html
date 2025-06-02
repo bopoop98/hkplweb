@@ -268,11 +268,10 @@
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white py-6 mt-10">
-        <div class="container text-center text-sm">
-            <p>&copy; <span id="current-year"></span> <span data-key="footerLeagueName">Local Football League</span>. <span data-key="footerRights">All rights reserved.</span></p>
-            <p class="text-xs mt-2" data-key="dataLastUpdatedPrefix">Data last updated: <span id="data-last-updated">Not available</span></p>
-        </div>
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8 text-sm">
+        <div class="container mx-auto">
+            <p>&copy; <span id="current-year"></span> Your League. All rights reserved.</p>
+        <div id="footer-date-container"></div> </div>
     </footer>
 
     <div id="login-modal" class="modal">
@@ -600,27 +599,41 @@
             });
             matchesListDiv.appendChild(ul);
         }
-        
+
         // --- FOOTER ---
         function updateFooter() {
             const yearSpan = document.getElementById('current-year');
             if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-            const lastUpdatedSpan = document.getElementById('data-last-updated');
-            if (lastUpdatedSpan && lastUpdatedTimestamp) {
-                const lastUpdateDate = new Date(lastUpdatedTimestamp);
-                lastUpdatedSpan.textContent = lastUpdateDate.toLocaleDateString(undefined, {
-                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-                // TEMPORARY: Add this line to see if *anything* updates
-                document.getElementById('main-title').textContent += ' (Updated!)';
-            } else if (lastUpdatedSpan) {
-                lastUpdatedSpan.textContent = "Not available";
-                 // TEMPORARY: Add this line for debugging
-                document.getElementById('main-title').textContent += ' (Not Updated!)';
+            // Get the new container element
+            const footerDateContainer = document.getElementById('footer-date-container');
+
+            console.log('--- Footer Update Called ---'); // Marker for when the function runs
+            console.log('  1. footerDateContainer element:', footerDateContainer); // CRITICAL: Is this null or the element?
+            console.log('  2. lastUpdatedTimestamp value:', lastUpdatedTimestamp); // CRITICAL: Is this a Date object or null?
+
+            if (footerDateContainer) { // If the container element was successfully found
+                if (lastUpdatedTimestamp) { // If the timestamp value is present and valid
+                    const lastUpdateDate = new Date(lastUpdatedTimestamp);
+                    footerDateContainer.innerHTML = `Data last updated: ${lastUpdateDate.toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}`;
+                    footerDateContainer.style.backgroundColor = 'yellow'; // Visual confirmation
+                    footerDateContainer.style.padding = '2px 5px';
+                    footerDateContainer.style.borderRadius = '3px';
+                    console.log('  3. Footer: Date applied and background set to yellow.');
+                } else { // If the timestamp value is null or undefined
+                    footerDateContainer.innerHTML = "Data last updated: Not available (Timestamp is null)";
+                    footerDateContainer.style.backgroundColor = 'lightgray'; // Visual confirmation
+                    footerDateContainer.style.padding = '2px 5px';
+                    footerDateContainer.style.borderRadius = '3px';
+                    console.log('  3. Footer: Not available applied and background set to lightgray.');
+                }
+            } else { // If the footerDateContainer element was NOT found
+                console.error('  3. Footer: ERROR - "footer-date-container" element was NOT found in the DOM!');
             }
         }
-
+        
         // --- UI VISIBILITY FUNCTIONS ---
         function showSection(sectionId) {
             document.querySelectorAll('section').forEach(section => {
