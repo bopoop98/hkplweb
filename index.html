@@ -34,16 +34,82 @@
         .nav-item:hover {
             background-color: #3b82f6; /* Blue-500 */
         }
-        .table-header th {
-            background-color: #1e3a8a; /* Dark blue */
-            color: white;
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.875rem; /* text-sm */
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        
+    .table-header th {
+        background-color: #1e3a8a; /* Dark blue */
+        color: white;
+    }
+    .standings-table {
+        width: 100%;
+        border-collapse: collapse;
+        /* REMOVE OR CHANGE THIS: table-layout: fixed; */
+        /* Option A: Remove it for auto sizing */
+        /* Option B: Change to table-layout: auto; */
+        table-layout: auto; /* Let browser decide column widths based on content */
+    }
+    .standings-table th, .standings-table td {
+        padding: 0.75rem 0.5rem;
+        text-align: center;
+        border-bottom: 1px solid #e2e8f0; /* Light gray border */
+        overflow: hidden;
+        /* REMOVE white-space: nowrap; if you want text to wrap everywhere */
+        /* text-overflow: ellipsis; */ /* Remove if text is allowed to wrap */
+    }
+    .standings-table td:first-child,
+    .standings-table th:first-child {
+        text-align: left; /* Align first column (Position) to left */
+    }
+    .standings-table td:nth-child(2) { /* This is your Team Name column */
+        /* Important: Allow text to wrap for long team names */
+        white-space: normal; /* Allow text to wrap naturally */
+        word-break: break-word; /* Break long words if necessary */
+        text-align: left; /* Align team names to the left */
+        max-width: none; /* Remove any max-width that might be constraining it */
+    }
+    /* ... (Keep other existing styles) ... */
+
+    /* Remove or adjust any @media (max-width: 768px) rules that force stacking */
+    /* If you *don't* want the table to stack on mobile, remove or comment out these lines: */
+    /*
+    @media (max-width: 768px) {
+        .standings-table thead {
+            display: none;
         }
+        .standings-table, .standings-table tbody, .standings-table tr, .standings-table td {
+            display: block;
+            width: 100%;
+        }
+        .standings-table tr {
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            background-color: white;
+        }
+        .standings-table td {
+            position: relative;
+            padding-left: 50%;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .standings-table td:last-child {
+            border-bottom: none;
+        }
+        .standings-table td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 6px;
+            width: 45%;
+            padding-right: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+            text-align: left;
+        }
+    }
+    */
+    /* End of mobile stacking rule removal */
         .section-title {
             border-bottom: 2px solid #1e3a8a; /* Dark blue */
             padding-bottom: 0.5rem;
@@ -603,24 +669,28 @@
         
         // --- FOOTER ---
         function updateFooter() {
-            const yearSpan = document.getElementById('current-year');
-            if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+    const yearSpan = document.getElementById('current-year');
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-            const lastUpdatedSpan = document.getElementById('data-last-updated');
-            if (lastUpdatedSpan && lastUpdatedTimestamp) {
-                const lastUpdateDate = new Date(lastUpdatedTimestamp);
-                lastUpdatedSpan.textContent = lastUpdateDate.toLocaleDateString(undefined, {
-                    year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                });
-                // TEMPORARY: Add this line to see if *anything* updates
-                document.getElementById('main-title').textContent += ' (Updated!)';
-            } else if (lastUpdatedSpan) {
-                lastUpdatedSpan.textContent = "Not available";
-                 // TEMPORARY: Add this line for debugging
-                document.getElementById('main-title').textContent += ' (Not Updated!)';
-            }
-        }
+    const lastUpdatedSpan = document.getElementById('data-last-updated');
+    if (lastUpdatedSpan && lastUpdatedTimestamp) {
+        const lastUpdateDate = new Date(lastUpdatedTimestamp);
+         lastUpdatedSpan.textContent = lastUpdateDate.toLocaleDateString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        });
+        // TEMPORARY DEBUGGING LINE: Change background to clearly see if this block executes
+        lastUpdatedSpan.style.backgroundColor = 'yellow';
+        lastUpdatedSpan.style.padding = '2px 5px';
+        lastUpdatedSpan.style.borderRadius = '3px';
 
+    } else if (lastUpdatedSpan) {
+        lastUpdatedSpan.textContent = "Not available";
+        // TEMPORARY DEBUGGING LINE: Change background to clearly see if this block executes
+        lastUpdatedSpan.style.backgroundColor = 'lightgray';
+        lastUpdatedSpan.style.padding = '2px 5px';
+        lastUpdatedSpan.style.borderRadius = '3px';
+    }
+}
         // --- UI VISIBILITY FUNCTIONS ---
         function showSection(sectionId) {
             document.querySelectorAll('section').forEach(section => {
