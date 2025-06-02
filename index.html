@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local Football League</title>
+    <title>Hsig Khaung Premier League</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -34,48 +34,16 @@
         .nav-item:hover {
             background-color: #3b82f6; /* Blue-500 */
         }
-        
-    .table-header th {
-        background-color: #1e3a8a; /* Dark blue */
-        color: white;
-    }
-        
-    /* General table cell styles - ensure these are present */
-    .standings-table th, .standings-table td {
-        padding: 0.75rem 0.5rem;
-        text-align: center;
-        border-bottom: 1px solid #e2e8f0;
-        overflow: hidden; /* Important for ellipsis */
-        white-space: nowrap; /* Default: keep text on one line for all cells */
-        text-overflow: ellipsis; /* Default: add ellipsis for overflow */
-    }
-    .standings-table td:first-child,
-    .standings-table th:first-child {
-        text-align: left;
-    }
-
-    /* Team Name column (2nd child) - Default for larger screens (>769px) */
-    .standings-table td:nth-child(2) {
-        text-align: left;
-        white-space: normal; /* Allow wrapping on larger screens */
-        overflow: visible;   /* No hidden overflow on larger screens */
-        text-overflow: clip; /* No ellipsis on larger screens */
-        /* Ensure no conflicting max-width here for larger screens */
-    }
-
-    /* Mobile specific styles for table - Truncation for Team Name below 770px */
-    @media (max-width: 769px) { /* Applies to screens 769px and smaller */
-        .standings-table td:nth-child(2) { /* Target the Team Name column */
-            white-space: nowrap;        /* Force text to stay on one line */
-            overflow: hidden;           /* Hide overflowing content */
-            text-overflow: ellipsis;    /* Add "..." for overflow */
-            max-width: 20ch;            /* Limit width to approx. 20 characters before ellipsis */
+        .table-header th {
+            background-color: #1e3a8a; /* Dark blue */
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.875rem; /* text-sm */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
-        /* IMPORTANT: Ensure there are NO other @media (max-width: 769px) rules for .standings-table
-           or .responsive-table that apply `display: block;` to table rows/cells.
-           Those are the stacking rules you want to avoid. */
-    }
-
         .section-title {
             border-bottom: 2px solid #1e3a8a; /* Dark blue */
             padding-bottom: 0.5rem;
@@ -256,7 +224,7 @@
         <section id="league-standings" class="mt-8">
             <h2 class="section-title mb-4" data-key="leagueStandingsTitle">League Standings</h2>
             <div class="overflow-x-auto bg-white rounded-lg shadow">
-                <table class="min-w-full">
+                <table class="min-w-full responsive-table">
                     <thead class="table-header">
                         <tr>
                             <th class="p-3 text-sm" data-key="posHeader">Pos</th>
@@ -300,11 +268,10 @@
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white py-6 mt-10">
-        <div class="container text-center text-sm">
-            <p>&copy; <span id="current-year"></span> <span data-key="footerLeagueName">Local Football League</span>. <span data-key="footerRights">All rights reserved.</span></p>
-            <p class="text-xs mt-2" data-key="dataLastUpdatedPrefix">Data last updated: <span id="data-last-updated">Not available</span></p>
-        </div>
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8 text-sm">
+        <div class="container mx-auto">
+            <p>&copy; <span id="current-year"></span> Your League. All rights reserved.</p>
+        <div id="footer-date-container"></div> </div>
     </footer>
 
     <div id="login-modal" class="modal">
@@ -350,7 +317,7 @@
         // --- LANGUAGE TRANSLATIONS ---
         const translations = {
             en: {
-                mainTitle: "Local Football League",
+                mainTitle: "Hsig Khaung Premier League",
                 upcomingMatchesTitle: "Upcoming Matches This Week",
                 loadingMatches: "Loading matches...",
                 noUpcomingMatches: "No upcoming matches scheduled for this week.",
@@ -381,7 +348,7 @@
                 dataLastUpdatedPrefix: "Data last updated:"
             },
             my: { // Myanmar translations (simplified for example)
-                mainTitle: "ပြည်တွင်းဘောလုံးလိဂ်",
+                mainTitle: "ဆိုက်ခေါင်ပရီးမီးယားလိဂ်",
                 upcomingMatchesTitle: "လာမည့်ပွဲစဉ်များ",
                 loadingMatches: "ပွဲစဉ်များ တင်နေသည်...",
                 noUpcomingMatches: "ယခုသီတင်းပတ်အတွက် လာမည့်ပွဲစဉ်များ မရှိပါ။",
@@ -441,7 +408,15 @@
 
         // --- UTILITY FUNCTIONS ---
         function getTeamById(teamId) {
-            return allTeams.find(team => team.id === teamId);
+        const team = allTeams.find(team => team.id === teamId);
+        if (team) {
+        // Check if team.name_mm exists and if current language is Myanmar
+        if (currentLanguage === 'my' && team.name_mm) {
+            return { ...team, name: team.name_mm }; // Return team object with 'name' set to the Myanmar name
+                }
+                return team; // Otherwise, return the team with its default 'name' (English)
+                    }
+         return null;
         }
 
         function getPlayerById(playerId) {
@@ -638,18 +613,32 @@
             const yearSpan = document.getElementById('current-year');
             if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-            const lastUpdatedSpan = document.getElementById('data-last-updated');
+            // Get the new container element
+            const footerDateContainer = document.getElementById('footer-date-container');
 
-            console.log('updateFooter called.');
-            console.log('  lastUpdatedSpan element (should not be null):', lastUpdatedSpan); // CRITICAL: What does this log?
-            console.log('  lastUpdatedTimestamp value (from Firebase):', lastUpdatedTimestamp); // CRITICAL: What does this log?
+            console.log('--- Footer Update Called ---'); // Marker for when the function runs
+            console.log('  1. footerDateContainer element:', footerDateContainer); // CRITICAL: Is this null or the element?
+            console.log('  2. lastUpdatedTimestamp value:', lastUpdatedTimestamp); // CRITICAL: Is this a Date object or null?
 
-            if (lastUpdatedSpan) { // If the span element IS found
-                lastUpdatedSpan.textContent = "DEBUG: SPAN FOUND!"; // Simple text to confirm it's found
-                lastUpdatedSpan.style.backgroundColor = 'purple'; // Very obvious color
-                console.log('  Footer: Span found and set to purple.');
-            } else { // If the span element is NOT found
-                console.log('  Footer: ERROR - "data-last-updated" span was NOT found in DOM!');
+            if (footerDateContainer) { // If the container element was successfully found
+                if (lastUpdatedTimestamp) { // If the timestamp value is present and valid
+                    const lastUpdateDate = new Date(lastUpdatedTimestamp);
+                    footerDateContainer.innerHTML = `Data last updated: ${lastUpdateDate.toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}`;
+                    footerDateContainer.style.backgroundColor = 'yellow'; // Visual confirmation
+                    footerDateContainer.style.padding = '2px 5px';
+                    footerDateContainer.style.borderRadius = '3px';
+                    console.log('  3. Footer: Date applied and background set to yellow.');
+                } else { // If the timestamp value is null or undefined
+                    footerDateContainer.innerHTML = "Data last updated: Not available (Timestamp is null)";
+                    footerDateContainer.style.backgroundColor = 'lightgray'; // Visual confirmation
+                    footerDateContainer.style.padding = '2px 5px';
+                    footerDateContainer.style.borderRadius = '3px';
+                    console.log('  3. Footer: Not available applied and background set to lightgray.');
+                }
+            } else { // If the footerDateContainer element was NOT found
+                console.error('  3. Footer: ERROR - "footer-date-container" element was NOT found in the DOM!');
             }
         }
         
