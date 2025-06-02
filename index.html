@@ -408,16 +408,16 @@
 
         // --- UTILITY FUNCTIONS ---
         function getTeamById(teamId) {
-        const team = allTeams.find(team => team.id === teamId);
-        if (team) {
+    const team = allTeams.find(team => team.id === teamId);
+    if (team) {
         // Check if team.name_mm exists and if current language is Myanmar
         if (currentLanguage === 'my' && team.name_mm) {
             return { ...team, name: team.name_mm }; // Return team object with 'name' set to the Myanmar name
-                }
-                return team; // Otherwise, return the team with its default 'name' (English)
-                    }
-         return null;
         }
+        return team; // Otherwise, return the team with its default 'name' (English)
+    }
+    return null;
+}
 
         function getPlayerById(playerId) {
             return allPlayers.find(player => player.id === playerId);
@@ -609,38 +609,38 @@
         }
 
         // --- FOOTER ---
-        function updateFooter() {
-            const yearSpan = document.getElementById('current-year');
-            if (yearSpan) yearSpan.textContent = new Date().getFullYear();
+function updateFooter() {
+    const yearSpan = document.getElementById('current-year');
+    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
 
-            // Get the new container element
-            const footerDateContainer = document.getElementById('footer-date-container');
+    const footerDateContainer = document.getElementById('footer-date-container');
 
-            console.log('--- Footer Update Called ---'); // Marker for when the function runs
-            console.log('  1. footerDateContainer element:', footerDateContainer); // CRITICAL: Is this null or the element?
-            console.log('  2. lastUpdatedTimestamp value:', lastUpdatedTimestamp); // CRITICAL: Is this a Date object or null?
+    // console.log('--- Footer Update Called ---'); // Keep for debugging if needed
+    // console.log('  1. footerDateContainer element:', footerDateContainer); // Keep for debugging if needed
+    // console.log('  2. lastUpdatedTimestamp value:', lastUpdatedTimestamp); // Keep for debugging if needed
 
-            if (footerDateContainer) { // If the container element was successfully found
-                if (lastUpdatedTimestamp) { // If the timestamp value is present and valid
-                    const lastUpdateDate = new Date(lastUpdatedTimestamp);
-                    footerDateContainer.innerHTML = `Data last updated: ${lastUpdateDate.toLocaleDateString(undefined, {
-                        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-                    })}`;
-                    footerDateContainer.style.backgroundColor = 'yellow'; // Visual confirmation
-                    footerDateContainer.style.padding = '2px 5px';
-                    footerDateContainer.style.borderRadius = '3px';
-                    console.log('  3. Footer: Date applied and background set to yellow.');
-                } else { // If the timestamp value is null or undefined
-                    footerDateContainer.innerHTML = "Data last updated: Not available (Timestamp is null)";
-                    footerDateContainer.style.backgroundColor = 'lightgray'; // Visual confirmation
-                    footerDateContainer.style.padding = '2px 5px';
-                    footerDateContainer.style.borderRadius = '3px';
-                    console.log('  3. Footer: Not available applied and background set to lightgray.');
-                }
-            } else { // If the footerDateContainer element was NOT found
-                console.error('  3. Footer: ERROR - "footer-date-container" element was NOT found in the DOM!');
-            }
+    if (footerDateContainer) {
+        if (lastUpdatedTimestamp) {
+            const lastUpdateDate = new Date(lastUpdatedTimestamp);
+            footerDateContainer.innerHTML = `${translations[currentLanguage].dataLastUpdatedPrefix} ${lastUpdateDate.toLocaleDateString(undefined, {
+                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+            })}`;
+            // Removed: footerDateContainer.style.backgroundColor = 'yellow';
+            footerDateContainer.style.padding = '2px 5px'; // Keep if you like padding
+            footerDateContainer.style.borderRadius = '3px'; // Keep if you like rounded corners
+            // console.log('  3. Footer: Date applied.'); // Keep for debugging if needed
+        } else {
+            footerDateContainer.innerHTML = `${translations[currentLanguage].dataLastUpdatedPrefix} Not available`;
+            // Removed: footerDateContainer.style.backgroundColor = 'lightgray';
+            footerDateContainer.style.padding = '2px 5px'; // Keep if you like padding
+            footerDateContainer.style.borderRadius = '3px'; // Keep if you like rounded corners
+            // console.log('  3. Footer: Not available applied.'); // Keep for debugging if needed
         }
+    } else {
+        console.error('  3. Footer: ERROR - "footer-date-container" element was NOT found in the DOM!');
+    }
+}
+
         
         // --- UI VISIBILITY FUNCTIONS ---
         function showSection(sectionId) {
