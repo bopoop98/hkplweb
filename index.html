@@ -34,10 +34,6 @@
         .nav-item:hover {
             background-color: #3b82f6; /* Blue-500 */
         }
-        .nav-item i {
-            margin-right: 0.75rem;
-            font-size: 1.2rem;
-        }
         .table-header th {
             background-color: #1e3a8a; /* Dark blue */
             color: white;
@@ -310,6 +306,7 @@
         let auth;
         let userId = null; // Initialize to null
         let isAdmin = false; // Flag to track admin status
+        let firebaseAppId = null; // Will store the actual appId from config
 
         // Global data stores (will be populated from Firestore)
         let allTeams = [];
@@ -688,9 +685,7 @@
 
         async function checkAdminStatus(uid) {
             try {
-                // Ensure __app_id is defined before trying to construct the path
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Fallback for local testing
-                const configDocRef = doc(db, `/artifacts/${appId}/public/data/leagues/${LEAGUE_ID}/settings/config`);
+                const configDocRef = doc(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/settings/config`);
                 const configSnap = await getDoc(configDocRef);
                 if (configSnap.exists()) {
                     const configData = configSnap.data();
@@ -708,12 +703,17 @@
         const LEAGUE_ID = 'hkpl'; // This should match your league ID in Firestore
 
         async function fetchFirestoreData() {
-            try {
-                // Ensure __app_id is defined before trying to construct the path
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Fallback for local testing
+            if (!firebaseAppId) {
+                console.error("Firebase App ID is not set. Cannot fetch Firestore data.");
+                document.getElementById('matches-list').innerHTML = `<p class="text-red-500 text-center">Firebase not configured. Check console.</p>`;
+                document.getElementById('standings-body').innerHTML = `<tr><td colspan="10" class="text-red-500 text-center p-4">Firebase not configured.</td></tr>`;
+                document.getElementById('scorers-grid').innerHTML = `<p class="text-red-500 text-center col-span-full">Firebase not configured.</p>`;
+                return;
+            }
 
+            try {
                 // Fetch Teams
-                onSnapshot(collection(db, `/artifacts/${appId}/public/data/leagues/${LEAGUE_ID}/teams`), (snapshot) => {
+                onSnapshot(collection(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/teams`), (snapshot) => {
                     allTeams = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     renderAllData();
                     console.log("Teams fetched:", allTeams);
@@ -723,7 +723,7 @@
                 });
 
                 // Fetch Players
-                onSnapshot(collection(db, `/artifacts/${appId}/public/data/leagues/${LEAGUE_ID}/players`), (snapshot) => {
+                onSnapshot(collection(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/players`), (snapshot) => {
                     allPlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     renderAllData();
                     console.log("Players fetched:", allPlayers);
@@ -733,7 +733,7 @@
                 });
 
                 // Fetch Matches
-                onSnapshot(collection(db, `/artifacts/${appId}/public/data/leagues/${LEAGUE_ID}/matches`), (snapshot) => {
+                onSnapshot(collection(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/matches`), (snapshot) => {
                     allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     renderAllData();
                     console.log("Matches fetched:", allMatches);
@@ -743,7 +743,7 @@
                 });
 
                 // Fetch Settings for last updated timestamp and admin UIDs
-                onSnapshot(doc(db, `/artifacts/${appId}/public/data/leagues/${LEAGUE_ID}/settings/config`), (docSnap) => {
+                onSnapshot(doc(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/settings/config`), (docSnap) => {
                     if (docSnap.exists()) {
                         const configData = docSnap.data();
                         lastUpdatedTimestamp = configData.lastUpdated?.toDate() || null;
@@ -819,7 +819,22 @@
 
             // Initialize Firebase
             try {
-                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                // *** PASTE YOUR FIREBASE CONFIG OBJECT HERE ***
+                const firebaseConfig = {
+                  apiKey: "AIzaSyDikFHg3TNUng-I9WgeTWXbO29SKxWNLZE",
+                  authDomain: "hkplweb.firebaseapp.com",
+                  projectId: "hkplweb",
+                  storageBucket: "hkplweb.firebasestorage.app",
+                  messagingSenderId: "1774261075",
+                  appId: "1:1774261075:web:cc26aa5d553dfd38ef87a6", // This is your 'measurementId' from Firebase Console web app settings
+                  measurementId: "G-XXXXXXXXXX" // Optional
+                };
+                // ********************************************
+
+                // Store appId globally for use in Firestore paths
+                firebaseAppId = firebaseConfig.appId;
+
+                // Initialize Firebase app
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
