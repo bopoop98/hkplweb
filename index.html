@@ -609,11 +609,15 @@
             const lastUpdatedSpan = document.getElementById('data-last-updated');
             if (lastUpdatedSpan && lastUpdatedTimestamp) {
                 const lastUpdateDate = new Date(lastUpdatedTimestamp);
-                 lastUpdatedSpan.textContent = lastUpdateDate.toLocaleDateString(undefined, {
+                lastUpdatedSpan.textContent = lastUpdateDate.toLocaleDateString(undefined, {
                     year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
                 });
+                // TEMPORARY: Add this line to see if *anything* updates
+                document.getElementById('main-title').textContent += ' (Updated!)';
             } else if (lastUpdatedSpan) {
                 lastUpdatedSpan.textContent = "Not available";
+                 // TEMPORARY: Add this line for debugging
+                document.getElementById('main-title').textContent += ' (Not Updated!)';
             }
         }
 
