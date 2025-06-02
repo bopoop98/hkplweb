@@ -39,77 +39,48 @@
         background-color: #1e3a8a; /* Dark blue */
         color: white;
     }
+        /* General Table Styling - Reverted/Adjusted */
     .standings-table {
         width: 100%;
         border-collapse: collapse;
-        /* REMOVE OR CHANGE THIS: table-layout: fixed; */
-        /* Option A: Remove it for auto sizing */
-        /* Option B: Change to table-layout: auto; */
-        table-layout: auto; /* Let browser decide column widths based on content */
+        table-layout: fixed; /* Keep fixed layout for consistent columns */
     }
     .standings-table th, .standings-table td {
         padding: 0.75rem 0.5rem;
         text-align: center;
-        border-bottom: 1px solid #e2e8f0; /* Light gray border */
-        overflow: hidden;
-        /* REMOVE white-space: nowrap; if you want text to wrap everywhere */
-        /* text-overflow: ellipsis; */ /* Remove if text is allowed to wrap */
+        border-bottom: 1px solid #e2e8f0;
+        overflow: hidden; /* Important for ellipsis */
+        white-space: nowrap; /* Keep text on one line by default */
+        text-overflow: ellipsis; /* Add ellipsis for overflow */
     }
     .standings-table td:first-child,
     .standings-table th:first-child {
         text-align: left; /* Align first column (Position) to left */
     }
-    .standings-table td:nth-child(2) { /* This is your Team Name column */
-        /* Important: Allow text to wrap for long team names */
-        white-space: normal; /* Allow text to wrap naturally */
-        word-break: break-word; /* Break long words if necessary */
+    /* Team Name column (2nd child) - Default for larger screens (>770px) */
+    .standings-table td:nth-child(2) {
         text-align: left; /* Align team names to the left */
-        max-width: none; /* Remove any max-width that might be constraining it */
+        /* On larger screens, no specific max-width, let it expand naturally */
+        white-space: normal; /* Allow wrapping on larger screens by default */
+        overflow: visible;   /* No hidden overflow on larger screens */
+        text-overflow: clip; /* No ellipsis on larger screens */
     }
-    /* ... (Keep other existing styles) ... */
 
-    /* Remove or adjust any @media (max-width: 768px) rules that force stacking */
-    /* If you *don't* want the table to stack on mobile, remove or comment out these lines: */
-    /*
-    @media (max-width: 768px) {
-        .standings-table thead {
-            display: none;
+    /* Mobile specific styles for table - Truncation for Team Name below 770px */
+    @media (max-width: 769px) { /* Applies to screens 769px and smaller */
+        .standings-table td:nth-child(2) { /* Target the Team Name column */
+            white-space: nowrap;        /* Force text to stay on one line */
+            overflow: hidden;           /* Hide overflowing content */
+            text-overflow: ellipsis;    /* Add "..." for overflow */
+            max-width: 15ch;            /* Limit width to approx. 15 characters, adjust as needed */
+                                        /* 15ch is a starting point, adjust if names are still too long or short */
         }
-        .standings-table, .standings-table tbody, .standings-table tr, .standings-table td {
-            display: block;
-            width: 100%;
-        }
-        .standings-table tr {
-            margin-bottom: 1rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            background-color: white;
-        }
-        .standings-table td {
-            position: relative;
-            padding-left: 50%;
-            text-align: right;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        .standings-table td:last-child {
-            border-bottom: none;
-        }
-        .standings-table td::before {
-            content: attr(data-label);
-            position: absolute;
-            left: 6px;
-            width: 45%;
-            padding-right: 10px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: 600;
-            text-align: left;
-        }
+        /* Keep any other mobile-specific rules you had, e.g., for stacking if desired */
+        /* If you had the full stacking rules (display: block, etc.) from the previous response,
+           and you want to revert them, you should remove them here. */
+        /* If you want the horizontal scroll only, do not use stacking rules below 769px. */
     }
-    */
-    /* End of mobile stacking rule removal */
+
         .section-title {
             border-bottom: 2px solid #1e3a8a; /* Dark blue */
             padding-bottom: 0.5rem;
