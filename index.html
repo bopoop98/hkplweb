@@ -459,7 +459,7 @@
 
             const teamsWithPoints = allTeams.map(team => ({
                 ...team,
-                pts: (team.won * 3) + (team.drawn * 1),
+                pts: (team.won * 3) + (team.draw * 1),
                 gd: (team.gf || 0) - (team.ga || 0)
             }));
 
@@ -481,7 +481,7 @@
                     </td>
                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].pHeader}">${team.played || 0}</td>
                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].wHeader}">${team.won || 0}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].dHeader}">${team.drawn || 0}</td>
+                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].dHeader}">${team.draw || 0}</td>
                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].lHeader}">${team.lost || 0}</td>
                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gfHeader}">${team.gf || 0}</td>
                     <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gaHeader}">${team.ga || 0}</td>
