@@ -9,888 +9,552 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light gray background */
-            color: #333;
-            line-height: 1.6;
+            background-color: #f7f8fc;
+            color: #1c1b1f;
         }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
+        .material-card {
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease-in-out;
         }
-        header {
-            background-color: #1e3a8a; /* Dark blue */
-            color: white;
-            padding: 1rem 0;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .material-card:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.08);
         }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        .table-header {
+            background-color: #e8eaf6;
         }
-        .nav-item:hover {
-            background-color: #3b82f6; /* Blue-500 */
+        .team-logo-sm { 
+            width: 28px;
+            height: 28px;
+            object-fit: contain; /* Use contain for logos */
         }
-        .table-header th {
-            background-color: #1e3a8a; /* Dark blue */
-            color: white;
-            padding: 0.75rem;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.875rem; /* text-sm */
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .team-logo-md { 
+            width: 32px; 
+            height: 32px; 
+            object-fit: contain; /* Use contain for logos */
         }
+        .player-pic-sm {
+            width: 36px;
+            height: 36px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 1px solid #e0e0e0;
+        }
+        .league-header-logo {
+            width: 48px; /* Same as SVG placeholder */
+            height: 48px;
+            object-fit: contain;
+            border-radius: 8px; /* Optional: if logos can be non-square */
+        }
+        .primary-accent { color: #3f51b5; }
+        .secondary-accent { color: #7e57c2; }
+        .header-gradient { background: linear-gradient(90deg, #4A00E0 0%, #8E2DE2 100%); }
         .section-title {
-            border-bottom: 2px solid #1e3a8a; /* Dark blue */
-            padding-bottom: 0.5rem;
+            font-size: 1.75rem;
+            font-weight: 700;
             margin-bottom: 1rem;
-            color: #1e3a8a;
-            font-size: 1.875rem; /* text-3xl */
-            font-weight: 700; /* font-bold */
+            color: #333;
         }
-        .card {
-            background-color: white;
-            border-radius: 0.5rem; /* rounded-lg */
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: transform 0.2s ease-in-out;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal.show {
-            display: flex;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            padding: 20px;
+        .match-score {
+            font-size: 1.1rem; 
+            font-weight: 600;
+            padding: 0.2rem 0.6rem; 
             border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            position: relative;
+            background-color: #e8eaf6;
         }
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 15px;
+        .upcoming-badge, .finished-badge, .ongoing-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
-        .close-button:hover,
-        .close-button:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .sidenav {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1001;
-            top: 0;
-            left: 0;
-            background-color: #1a202c; /* Darker blue-gray */
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.2);
-        }
-        .sidenav a {
-            padding: 8px 8px 8px 32px;
-            text-decoration: none;
-            font-size: 20px;
-            color: #818181;
-            display: block;
-            transition: 0.3s;
-        }
-        .sidenav a:hover {
-            color: #f1f1f1;
-        }
-        .sidenav .closebtn {
-            position: absolute;
-            top: 0;
-            right: 25px;
-            font-size: 36px;
-            margin-left: 50px;
-        }
-        @media screen and (max-height: 450px) {
-            .sidenav {padding-top: 15px;}
-            .sidenav a {font-size: 18px;}
-        }
+        .upcoming-badge { background-color: #ffeb3b; color: #333; }
+        .finished-badge { background-color: #c8e6c9; color: #2e7d32; }
+        .ongoing-badge { background-color: #ffcc80; color: #ef6c00; } /* Orange for ongoing */
 
-        /* Responsive table behavior */
-        @media (max-width: 768px) {
-            table.responsive-table {
-                border: 0;
-            }
-            table.responsive-table thead {
-                display: none;
-            }
-            table.responsive-table tr {
-                display: block;
-                margin-bottom: 1rem;
-                border: 1px solid #ddd;
-                border-radius: 0.5rem;
-                background-color: white;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            }
-            table.responsive-table td {
-                display: block;
-                text-align: right;
-                padding-left: 50%;
-                position: relative;
-            }
-            table.responsive-table td::before {
-                content: attr(data-label);
-                position: absolute;
-                left: 0;
-                width: 45%;
-                padding-left: 1rem;
-                font-weight: bold;
-                text-align: left;
-                color: #555;
-            }
-            table.responsive-table td:first-child {
-                border-top-left-radius: 0.5rem;
-                border-top-right-radius: 0.5rem;
-            }
-            table.responsive-table td:last-child {
-                border-bottom-left-radius: 0.5rem;
-                border-bottom-right-radius: 0.5rem;
-            }
-            .team-name-cell {
-                justify-content: flex-end; /* Align content to right */
-            }
-            .team-name-cell .flex {
-                width: 100%;
-                justify-content: flex-end; /* Ensure flex content aligns right */
-            }
-            .team-name-cell img {
-                margin-right: auto; /* Push image to the left within the flex container */
-            }
+        .table-container { overflow-x: auto; }
+        th, td { white-space: nowrap; }
+        .loading-text {
+            text-align: center;
+            padding: 1rem;
+            color: #555;
+            font-style: italic;
         }
     </style>
 </head>
-<body>
-    <header>
-        <div class="container flex justify-between items-center">
-            <div class="flex items-center space-x-4">
-                <button id="hamburger-menu" class="text-white focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </button>
-                <h1 id="main-title" class="text-2xl font-bold">Local Football League</h1>
+<body class="antialiased">
+
+    <header class="header-gradient text-white p-6 shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img id="leagueLogoHeader" src="https://placehold.co/48x48/FFFFFF/4A00E0?text=LCL" alt="League Logo" class="league-header-logo">
+                <h1 id="leagueNameHeader" class="text-3xl font-bold tracking-tight">Hsig Khaung Premier League</h1>
             </div>
-            <div class="flex space-x-2">
-                <button id="lang-en" class="lang-button px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-sm active" data-lang="en">EN</button>
-                <button id="lang-my" class="lang-button px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-sm" data-lang="my">MY</button>
-            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#matches" class="hover:text-yellow-300 transition-colors">Matches</a>
+                <a href="#league-standings" class="hover:text-yellow-300 transition-colors">Standings</a>
+                <a href="#top-scorers" class="hover:text-yellow-300 transition-colors">Top Scorers</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <div id="mobile-menu" class="md:hidden hidden mt-3">
+            <a href="#matches" class="block py-2 px-4 text-sm hover:bg-purple-700 rounded">Matches</a>
+            <a href="#league-standings" class="block py-2 px-4 text-sm hover:bg-purple-700 rounded">Standings</a>
+            <a href="#top-scorers" class="block py-2 px-4 text-sm hover:bg-purple-700 rounded">Top Scorers</a>
         </div>
     </header>
 
-    <div id="mySidenav" class="sidenav">
-        <a href="javascript:void(0)" class="closebtn" id="close-nav">&times;</a>
-        <a href="#" class="nav-item" id="nav-home">Home</a>
-        <a href="#" class="nav-item hidden" id="nav-admin-dashboard">Admin Dashboard</a>
-        <a href="#" class="nav-item" id="nav-login">Login / Admin Access</a>
-    </div>
+    <main class="container mx-auto p-4 md:p-8 space-y-12">
 
-    <main class="container py-6">
-        <section id="upcoming-matches">
-            <h2 class="section-title mb-4" data-key="upcomingMatchesTitle">Upcoming Matches This Week</h2>
-            <div id="matches-list" class="bg-white p-4 rounded-lg shadow min-h-[100px] flex items-center justify-center">
-                <p class="text-gray-600" data-key="loadingMatches">Loading matches...</p>
-            </div>
-        </section>
-
-        <section id="league-standings" class="mt-8">
-            <h2 class="section-title mb-4" data-key="leagueStandingsTitle">League Standings</h2>
-            <div class="overflow-x-auto bg-white rounded-lg shadow">
-                <table class="min-w-full responsive-table">
-                    <thead class="table-header">
-                        <tr>
-                            <th class="p-3 text-sm" data-key="posHeader">Pos</th>
-                            <th class="p-3 text-sm" data-key="teamHeader">Team</th>
-                            <th class="p-3 text-sm" data-key="pHeader">P</th>
-                            <th class="p-3 text-sm" data-key="wHeader">W</th>
-                            <th class="p-3 text-sm" data-key="dHeader">D</th>
-                            <th class="p-3 text-sm" data-key="lHeader">L</th>
-                            <th class="p-3 text-sm" data-key="gfHeader">GF</th>
-                            <th class="p-3 text-sm" data-key="gaHeader">GA</th>
-                            <th class="p-3 text-sm" data-key="gdHeader">GD</th>
-                            <th class="p-3 text-sm" data-key="ptsHeader">Pts</th>
-                        </tr>
-                    </thead>
-                    <tbody id="standings-body" class="divide-y divide-gray-200">
-                        <tr><td colspan="10" class="text-gray-600 text-center p-4" data-key="loadingStandings">Loading standings...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section id="top-scorers" class="mt-8">
-            <h2 class="section-title mb-4" data-key="topScorersTitle">Top Scorers</h2>
-            <div id="scorers-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                <p class="text-gray-600 text-center col-span-full" data-key="loadingScorers">Loading top scorers...</p>
-            </div>
-        </section>
-
-        <section id="admin-dashboard" class="mt-8 hidden">
-            <h2 class="section-title mb-4">Admin Dashboard</h2>
-            <div class="bg-white p-6 rounded-lg shadow">
-                <div class="flex flex-wrap gap-4 mb-6">
-                    <button id="manage-teams-btn" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">Manage Teams</button>
-                    <button id="manage-players-btn" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">Manage Players</button>
-                    <button id="manage-matches-btn" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">Manage Matches</button>
+        <section id="matches">
+            <h2 class="section-title primary-accent">Matches</h2>
+            <div id="finished-matches-container" class="mb-10">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Finished Matches (12-24 hours ago)</h3>
+                <div id="loading-finished-matches" class="loading-text">Loading finished matches...</div>
+                <div id="no-recent-finished-matches" class="material-card p-6 text-center text-gray-500 hidden">
+                    <p>No recently finished matches (12-24 hours ago) to display.</p>
                 </div>
-                <div id="admin-content-area" class="border border-gray-200 p-4 rounded-lg bg-gray-50 min-h-[200px]">
-                    <p class="text-gray-600">Select an option above to manage league data.</p>
+            </div>
+            <div id="upcoming-matches-container">
+                <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Upcoming Matches</h3>
+                <div id="loading-upcoming-matches" class="loading-text">Loading upcoming matches...</div>
+                <div id="no-upcoming-matches" class="material-card p-6 text-center text-gray-500 hidden">
+                    <p>No upcoming matches scheduled yet. Check back later!</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="league-standings">
+            <h2 class="section-title primary-accent">League Standings</h2>
+            <div id="loading-standings" class="loading-text">Loading league standings...</div>
+            <div class="material-card p-0 overflow-hidden hidden" id="league-standings-card">
+                 <div class="table-container">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Pos</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider"></th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider" style="min-width: 200px;">Team Name</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">MP</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">W</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">D</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">L</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">GF</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">GA</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">GD</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="league-standings-body" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="top-scorers">
+            <h2 class="section-title primary-accent">Top Scorers</h2>
+            <div id="loading-top-scorers" class="loading-text">Loading top scorers...</div>
+            <div class="material-card p-0 overflow-hidden hidden" id="top-scorers-card">
+                <div class="table-container">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Rank</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider" style="min-width: 180px;">Player</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider"></th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider" style="min-width: 150px;">Team</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Goals</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Assists</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">Played</th>
+                            </tr>
+                        </thead>
+                        <tbody id="top-scorers-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+                    </table>
+                </div>
+                <div id="no-top-scorers" class="p-6 text-center text-gray-500 hidden">
+                     <p>Top scorer data is not available yet.</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="bg-gray-800 text-white text-center p-4 mt-8 text-sm">
-        <div class="container mx-auto">
-            <p>&copy; <span id="current-year"></span> Your League. All rights reserved.</p>
-        <div id="footer-date-container"></div> </div>
+    <footer class="bg-gray-800 text-gray-300 p-8 text-center mt-12">
+        <p>&copy; <span id="currentYear"></span> Local Champions League. All rights reserved.</p>
+        <p class="text-sm">Powered by Firebase</p>
     </footer>
 
-    <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button" id="close-login-modal">&times;</span>
-            <h2 class="text-xl font-bold mb-4">Admin Login</h2>
-            <div class="mb-4">
-                <label for="login-email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                <input type="email" id="login-email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="admin@example.com">
-            </div>
-            <div class="mb-6">
-                <label for="login-password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
-                <input type="password" id="login-password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" placeholder="********">
-            </div>
-            <p id="login-error-message" class="text-red-500 text-xs italic mb-4 hidden"></p>
-            <button id="login-button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full">
-                Login
-            </button>
-        </div>
-    </div>
-
     <script type="module">
-        // Import Firebase SDKs
+        // Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase variables (globally accessible within this script module)
+        // Firebase config and App ID (to be provided by the Canvas environment)
+        const firebaseConfig = {                  
+            apiKey: "AIzaSyDikFHg3TNUng-I9WgeTWXbO29SKxWNLZE",                  
+            authDomain: "hkplweb.firebaseapp.com",                  
+            projectId: "hkplweb",                  
+            storageBucket: "hkplweb.firebasestorage.app",                  
+            messagingSenderId: "1774261075",                  
+            appId: "1:1774261075:web:cc26aa5d553dfd38ef87a6", // This is your 'measurementId' from Firebase Console web app settings                  
+            measurementId: "G-XXXXXXXXXX" // Optional                
+        };
+        const appId = "hkplweb"; // Directly set the app ID based on your project ID
+
+        // Initialize Firebase
         let app;
         let db;
-        let auth;
-        let userId = null; // Initialize to null
-        let isAdmin = false; // Flag to track admin status
-        let firebaseAppId = null; // Will store the actual appId from config
+        let auth; 
 
-        // Global data stores (will be populated from Firestore)
-        let allTeams = [];
-        let allPlayers = [];
-        let allMatches = [];
-        let adminUids = []; // Stores UIDs of admin users
-        let lastUpdatedTimestamp = null; // To store the last updated time from Firestore settings
+        // Global data stores
+        let teamsData = [];
+        let leagueDetails = {};
 
-        // --- LANGUAGE TRANSLATIONS ---
-        const translations = {
-            en: {
-                mainTitle: "Hsig Khaung Premier League",
-                upcomingMatchesTitle: "Upcoming Matches This Week",
-                loadingMatches: "Loading matches...",
-                noUpcomingMatches: "No upcoming matches scheduled for this week.",
-                live: "LIVE",
-                ft: "FT",
-                leagueStandingsTitle: "League Standings",
-                loadingStandings: "Loading standings...",
-                noStandingsData: "No standings data available.",
-                posHeader: "Pos",
-                teamHeader: "Team",
-                pHeader: "P",
-                wHeader: "W",
-                dHeader: "D",
-                lHeader: "L",
-                gfHeader: "GF",
-                gaHeader: "GA",
-                gdHeader: "GD",
-                ptsHeader: "Pts",
-                topScorersTitle: "Top Scorers",
-                loadingScorers: "Loading top scorers...",
-                noScorersData: "No top scorers data available.",
-                mp: "MP",
-                g: "G",
-                a: "A",
-                vs: "vs",
-                footerLeagueName: "Local Football League",
-                footerRights: "All rights reserved.",
-                dataLastUpdatedPrefix: "Data last updated:"
-            },
-            my: { // Myanmar translations (simplified for example)
-                mainTitle: "ဆိုက်ခေါင်ပရီးမီးယားလိဂ်",
-                upcomingMatchesTitle: "လာမည့်ပွဲစဉ်များ",
-                loadingMatches: "ပွဲစဉ်များ တင်နေသည်...",
-                noUpcomingMatches: "ယခုသီတင်းပတ်အတွက် လာမည့်ပွဲစဉ်များ မရှိပါ။",
-                live: "တိုက်ရိုက်",
-                ft: "ပွဲပြီး",
-                leagueStandingsTitle: "လိဂ်ရပ်တည်မှု",
-                loadingStandings: "ရပ်တည်မှုများ တင်နေသည်...",
-                noStandingsData: "ရပ်တည်မှုဒေတာ မရှိပါ။",
-                posHeader: "အဆင့်",
-                teamHeader: "အသင်း",
-                pHeader: "ပွဲ",
-                wHeader: "နိုင်",
-                dHeader: "သရေ",
-                lHeader: "ရှုံး",
-                gfHeader: "သွင်း",
-                gaHeader: "ပေး",
-                gdHeader: "ဂိုးကွာ",
-                ptsHeader: "ရမှတ်",
-                topScorersTitle: "ဂိုးသွင်းအများဆုံးများ",
-                loadingScorers: "ဂိုးသွင်းအများဆုံးများ တင်နေသည်...",
-                noScorersData: "ဂိုးသွင်းအများဆုံးဒေတာ မရှိပါ။",
-                mp: "ပွဲ",
-                g: "ဂိုး",
-                a: "ဖန်",
-                vs: "နှင့်",
-                footerLeagueName: "ပြည်တွင်းဘောလုံးလိဂ်",
-                footerRights: "အခွင့်အရေးများအားလုံး ကာကွယ်ထားပါသည်။",
-                dataLastUpdatedPrefix: "ဒေတာ နောက်ဆုံးအပ်ဒိတ်လုပ်သည်:"
-            }
-        };
+        // Utility to get team data by ID
+        const getTeamDataById = (id) => teamsData.find(team => team.id === id);
+        const defaultLogoUrl = "https://placehold.co/40x40/CCCCCC/757575?text=N/A";
+        const defaultPlayerImgUrl = "https://placehold.co/36x36/CCCCCC/757575?text=P";
 
-        let currentLanguage = localStorage.getItem('preferredLanguage') || 'en'; // Default to English
-
-        // --- LANGUAGE SWITCHER FUNCTION ---
-        function setLanguage(lang) {
-            currentLanguage = lang;
-            localStorage.setItem('preferredLanguage', lang); // Save preference
-
-            document.querySelectorAll('[data-key]').forEach(element => {
-                const key = element.getAttribute('data-key');
-                if (translations[lang] && translations[lang][key]) {
-                    element.textContent = translations[lang][key];
-                }
-            });
-
-            document.getElementById('main-title').textContent = translations[lang].mainTitle;
-            renderAllData(); // Re-render data to apply new language
-            
-            document.querySelectorAll('.lang-button').forEach(button => {
-                if (button.dataset.lang === lang) {
-                    button.classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                }
-            });
-        }
-
-        // --- UTILITY FUNCTIONS ---
-        function getTeamById(teamId) {
-    const team = allTeams.find(team => team.id === teamId);
-    if (team) {
-        // Check if team.name_mm exists and if current language is Myanmar
-        if (currentLanguage === 'my' && team.name_mm) {
-            return { ...team, name: team.name_mm }; // Return team object with 'name' set to the Myanmar name
-        }
-        return team; // Otherwise, return the team with its default 'name' (English)
-    }
-    return null;
-}
-
-        function getPlayerById(playerId) {
-            return allPlayers.find(player => player.id === playerId);
-        }
-
-        function getMatchStatusAndDisplay(match) {
-            const MATCH_DURATION_MINUTES = 90;
-            const matchDateTime = new Date(`${match.date}T${match.time}:00`);
-            const now = new Date();
-            const matchEndTime = new Date(matchDateTime.getTime() + (MATCH_DURATION_MINUTES * 60 * 1000));
-
-            const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
-            const dateOptions = { weekday: 'short', month: 'short', day: 'numeric' };
-
-            if (now >= matchDateTime && now <= matchEndTime) {
-                return {
-                    status: 'ongoing',
-                    display: translations[currentLanguage].live,
-                    scoreDisplay: `${match.homeScore} - ${match.awayScore}`
-                };
-            } else if (now < matchDateTime) {
-                const displayDateTime = `${matchDateTime.toLocaleDateString(undefined, dateOptions)} ${matchDateTime.toLocaleTimeString(undefined, timeOptions)}`;
-                return {
-                    status: 'upcoming',
-                    display: displayDateTime
-                };
-            } else {
-                return {
-                    status: 'finished',
-                    display: translations[currentLanguage].ft,
-                    scoreDisplay: `${match.homeScore} - ${match.awayScore}`
-                };
-            }
-        }
 
         // --- RENDER FUNCTIONS ---
-        function renderStandings() {
-            const standingsBody = document.getElementById('standings-body');
-            if (!standingsBody) return;
-            standingsBody.innerHTML = '';
+        function renderLeagueHeader() {
+            const leagueLogoHeader = document.getElementById('leagueLogoHeader');
+            const leagueNameHeader = document.getElementById('leagueNameHeader');
+            if (leagueDetails.LogoUrl) {
+                leagueLogoHeader.src = leagueDetails.LogoUrl;
+                leagueLogoHeader.onerror = () => { leagueLogoHeader.src = defaultLogoUrl; };
+            } else {
+                 leagueLogoHeader.src = defaultLogoUrl;
+            }
+            // Assuming league name might also come from 'hkpl' document or settings
+            // For now, keeping the hardcoded name if not in leagueDetails.name
+            leagueNameHeader.textContent = leagueDetails.name || "Hsig Khaung Premier League";
+        }
 
-            if (allTeams.length === 0) {
-                 standingsBody.innerHTML = `<tr><td colspan="10" class="text-gray-600 text-center p-4">${translations[currentLanguage].noStandingsData}</td></tr>`;
+
+        function renderMatches(matches, type) {
+            const finishedContainer = document.getElementById('finished-matches-container');
+            const upcomingContainer = document.getElementById('upcoming-matches-container');
+            const noUpcomingDiv = document.getElementById('no-upcoming-matches');
+            const noRecentFinishedDiv = document.getElementById('no-recent-finished-matches');
+            const loadingFinishedDiv = document.getElementById('loading-finished-matches');
+            const loadingUpcomingDiv = document.getElementById('loading-upcoming-matches');
+
+            let container, noDataDiv, loadingDiv;
+
+            if (type === 'finished') {
+                container = finishedContainer;
+                noDataDiv = noRecentFinishedDiv;
+                loadingDiv = loadingFinishedDiv;
+                // Clear previous content, but keep the title
+                container.innerHTML = '<h3 class="text-xl font-semibold mb-6 text-gray-700 border-b pb-2">Finished Matches (12-24 hours ago)</h3>';
+            } else { // upcoming
+                container = upcomingContainer;
+                noDataDiv = noUpcomingDiv;
+                loadingDiv = loadingUpcomingDiv;
+                container.innerHTML = '<h3 class="text-xl font-semibold mb-6 text-gray-700 border-b pb-2">Upcoming Matches</h3>';
+            }
+            
+            loadingDiv.classList.add('hidden'); // Hide loading indicator
+
+            if (matches.length === 0) {
+                noDataDiv.classList.remove('hidden');
+                container.appendChild(noDataDiv);
+                return;
+            }
+            noDataDiv.classList.add('hidden');
+
+            // Group finished matches by date if applicable
+            if (type === 'finished') {
+                const groupedMatches = matches.reduce((acc, match) => {
+                    const date = new Date(match.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+                    if (!acc[date]) acc[date] = [];
+                    acc[date].push(match);
+                    return acc;
+                }, {});
+
+                let matchesHTML = '';
+                for (const date in groupedMatches) {
+                    const dateHeaderEl = document.createElement('h4');
+                    dateHeaderEl.className = 'text-lg font-medium text-gray-600 mt-4 mb-2';
+                    dateHeaderEl.textContent = date;
+                    container.appendChild(dateHeaderEl);
+
+                    groupedMatches[date].forEach(match => {
+                        matchesHTML += generateMatchCardHTML(match);
+                    });
+                }
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = matchesHTML;
+                while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
+
+            } else { // Upcoming matches (not grouped by date in this layout)
+                let matchesHTML = '';
+                matches.forEach(match => {
+                    matchesHTML += generateMatchCardHTML(match);
+                });
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = matchesHTML;
+                while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
+            }
+        }
+
+        function generateMatchCardHTML(match) {
+            const homeTeam = getTeamDataById(match.homeTeamId);
+            const awayTeam = getTeamDataById(match.awayTeamId);
+
+            if (!homeTeam || !awayTeam) {
+                console.warn("Team data missing for match:", match.id, "Home:", match.homeTeamId, "Away:", match.awayTeamId);
+                return `<div class="material-card p-4 mb-3 text-red-500">Error: Team data missing for this match.</div>`;
+            }
+
+            const matchDateStr = new Date(match.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+            let statusBadge = '';
+            let scoreOrVs = '';
+
+            switch(match.status) {
+                case 'finished':
+                    statusBadge = `<span class="finished-badge">Finished</span>`;
+                    scoreOrVs = `<div class="match-score text-base md:text-lg font-bold primary-accent mx-1.5">${match.homeScore} - ${match.awayScore}</div>`;
+                    break;
+                case 'upcoming':
+                    statusBadge = `<span class="upcoming-badge">Upcoming</span>`;
+                    scoreOrVs = `<div class="text-xl font-bold secondary-accent mx-1.5">VS</div>`;
+                    break;
+                case 'ongoing':
+                    statusBadge = `<span class="ongoing-badge">Ongoing</span>`;
+                    scoreOrVs = `<div class="match-score text-base md:text-lg font-bold primary-accent mx-1.5">${match.homeScore} - ${match.awayScore}</div>`;
+                    break;
+                default:
+                    statusBadge = `<span class="text-xs text-gray-400">${match.status}</span>`;
+                    scoreOrVs = `<div class="text-xl font-bold secondary-accent mx-1.5">VS</div>`;
+            }
+            
+            return `
+                <div class="material-card p-4 mb-3"> 
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs text-gray-500">${match.status === 'upcoming' ? matchDateStr + ' - ' : ''}${match.time}</span>
+                        ${statusBadge}
+                    </div>
+                    <div class="flex items-center justify-around text-center">
+                        <div class="flex flex-col items-center w-2/5">
+                            <img src="${homeTeam.LogoUrl || defaultLogoUrl}" alt="${homeTeam.name}" class="team-logo-md mb-1" onerror="this.src='${defaultLogoUrl}'">
+                            <span class="font-semibold text-xs md:text-sm truncate w-full" title="${homeTeam.name}">${homeTeam.name}</span> 
+                        </div>
+                        ${scoreOrVs}
+                        <div class="flex flex-col items-center w-2/5">
+                            <img src="${awayTeam.LogoUrl || defaultLogoUrl}" alt="${awayTeam.name}" class="team-logo-md mb-1" onerror="this.src='${defaultLogoUrl}'">
+                            <span class="font-semibold text-xs md:text-sm truncate w-full" title="${awayTeam.name}">${awayTeam.name}</span> 
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+
+        function renderLeagueStandings(teams) {
+            const tbody = document.getElementById('league-standings-body');
+            const loadingDiv = document.getElementById('loading-standings');
+            const cardDiv = document.getElementById('league-standings-card');
+            
+            loadingDiv.classList.add('hidden');
+            cardDiv.classList.remove('hidden');
+            tbody.innerHTML = '';
+
+            if (!teams || teams.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4">No teams found or data is loading.</td></tr>`;
+                return;
+            }
+
+            const standings = teams.map(team => {
+                const gd = (team.gf || 0) - (team.ga || 0);
+                const pts = (team.won || 0) * 3 + (team.draw || 0);
+                return { ...team, gd, pts };
+            }).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name));
+
+            let rowsHTML = '';
+            standings.forEach((team, index) => {
+                rowsHTML += `
+                    <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-indigo-50 transition-colors">
+                        <td class="px-4 py-4 text-sm font-medium text-gray-700">${index + 1}</td> 
+                        <td class="px-4 py-4"><img src="${team.LogoUrl || defaultLogoUrl}" alt="${team.name}" class="team-logo-sm" onerror="this.src='${defaultLogoUrl}'"></td> 
+                        <td class="px-4 py-4 text-sm font-medium text-gray-900 truncate" style="max-width: 200px;" title="${team.name}">${team.name}</td>
+                        <td class="px-4 py-4 text-sm text-gray-600">${team.played || 0}</td>
+                        <td class="px-4 py-4 text-sm text-gray-600">${team.won || 0}</td>
+                        <td class="px-4 py-4 text-sm text-gray-600">${team.draw || 0}</td>
+                        <td class="px-4 py-4 text-sm text-gray-600">${team.lost || 0}</td>
+                        <td class="px-4 py-4 text-sm text-gray-600">${team.gf || 0}</td>
+                        <td class="px-4 py-4 text-sm text-gray-600">${team.ga || 0}</td>
+                        <td class="px-4 py-4 text-sm text-gray-600">${team.gd > 0 ? '+' : ''}${team.gd}</td>
+                        <td class="px-4 py-4 text-sm font-bold text-indigo-700">${team.pts}</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = rowsHTML;
+        }
+
+        function renderTopScorers(players) {
+            const tbody = document.getElementById('top-scorers-table-body');
+            const noTopScorersDiv = document.getElementById('no-top-scorers');
+            const loadingDiv = document.getElementById('loading-top-scorers');
+            const cardDiv = document.getElementById('top-scorers-card');
+            
+            loadingDiv.classList.add('hidden');
+            cardDiv.classList.remove('hidden');
+            tbody.innerHTML = ''; 
+
+            if (!players || players.length === 0) {
+                noTopScorersDiv.classList.remove('hidden');
+                tbody.closest('.table-container').classList.add('hidden'); // Hide table if no data
+                return;
+            }
+            
+            noTopScorersDiv.classList.add('hidden');
+            tbody.closest('.table-container').classList.remove('hidden'); // Show table
+
+            const sortedScorers = players
+                .filter(p => (p.goals || 0) > 0) // Only show players with goals
+                .sort((a, b) => (b.goals || 0) - (a.goals || 0) || (b.assists || 0) - (a.assists || 0) || (a.matchesPlayed || 0) - (b.matchesPlayed || 0));
+
+            if (sortedScorers.length === 0) {
+                 noTopScorersDiv.classList.remove('hidden');
+                 tbody.closest('.table-container').classList.add('hidden');
                  return;
             }
 
-            const teamsWithPoints = allTeams.map(team => ({
-                ...team,
-                pts: (team.won * 3) + (team.draw * 1),
-                gd: (team.gf || 0) - (team.ga || 0)
-            }));
 
-            const sortedTeams = [...teamsWithPoints].sort((a, b) => {
-                if (b.pts !== a.pts) return b.pts - a.pts;
-                if (b.gd !== a.gd) return b.gd - a.gd;
-                return b.gf - a.gf;
-            });
-
-            sortedTeams.forEach((team, index) => {
-                const row = standingsBody.insertRow();
-                row.innerHTML = `
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].posHeader}">${index + 1}</td>
-                    <td class="p-3 text-sm text-gray-900 font-medium team-name-cell" data-label="${translations[currentLanguage].teamHeader}">
-                        <div class="flex items-center">
-                            <img src="${team.logoUrl}" alt="${team.name} logo" class="w-6 h-6 mr-2 rounded-full" onerror="this.src='https://placehold.co/40x40/CCCCCC/FFFFFF?text=N/A';">
-                            ${team.name}
-                        </div>
-                    </td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].pHeader}">${team.played || 0}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].wHeader}">${team.won || 0}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].dHeader}">${team.draw || 0}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].lHeader}">${team.lost || 0}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gfHeader}">${team.gf || 0}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gaHeader}">${team.ga || 0}</td>
-                    <td class="p-3 text-sm text-gray-700 whitespace-nowrap" data-label="${translations[currentLanguage].gdHeader}">${team.gd > 0 ? '+' : ''}${team.gd}</td>
-                    <td class="p-3 text-sm text-gray-900 font-bold whitespace-nowrap" data-label="${translations[currentLanguage].ptsHeader}">${team.pts}</td>
+            let rowsHTML = '';
+            sortedScorers.forEach((scorer, index) => {
+                const team = getTeamDataById(scorer.team_id); // team_id from Firestore
+                rowsHTML += `
+                    <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-indigo-50 transition-colors">
+                        <td class="px-4 py-3 text-sm font-medium text-gray-700">${index + 1}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">
+                            <div class="flex items-center space-x-2.5">
+                                <img src="${scorer.imageUrl || defaultPlayerImgUrl}" alt="${scorer.name}" class="player-pic-sm" onerror="this.src='${defaultPlayerImgUrl}'">
+                                <span class="truncate" style="max-width: 120px;" title="${scorer.name}">${scorer.name}</span>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            ${team ? `<img src="${team.LogoUrl || defaultLogoUrl}" alt="${team.name}" class="team-logo-sm" onerror="this.src='${defaultLogoUrl}'">` : ''}
+                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-600 truncate" style="max-width: 150px;" title="${team ? team.name : 'N/A'}">${team ? team.name : 'N/A'}</td>
+                        <td class="px-4 py-3 text-sm font-semibold text-indigo-700">${scorer.goals || 0}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${scorer.assists || 0}</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">${scorer.matchesPlayed || 0}</td>
+                    </tr>
                 `;
             });
+            tbody.innerHTML = rowsHTML;
         }
 
-        function renderTopScorers() {
-            const scorersGrid = document.getElementById('scorers-grid');
-            if (!scorersGrid) return;
-            scorersGrid.innerHTML = '';
-
-            if (allPlayers.length === 0) {
-                scorersGrid.innerHTML = `<p class="text-gray-600 text-center col-span-full">${translations[currentLanguage].noScorersData}</p>`;
-                return;
-            }
-
-            const sortedScorers = [...allPlayers].sort((a,b) => {
-                if ((b.goals || 0) !== (a.goals || 0)) return (b.goals || 0) - (a.goals || 0);
-                return (b.assists || 0) - (a.assists || 0);
-            }).slice(0, 5);
-
-            sortedScorers.forEach(scorer => {
-                const team = getTeamById(scorer.teamId);
-                const card = document.createElement('div');
-                card.className = 'card p-4 flex flex-col items-center text-center'; 
-                card.innerHTML = `
-                    <img src="${scorer.imageUrl}" alt="${scorer.name}" class="w-20 h-20 rounded-full mb-3 object-cover shadow-lg" onerror="this.src='https://placehold.co/80x80/CCCCCC/FFFFFF?text=N/A';">
-                    <h3 class="text-lg font-semibold text-blue-600">${scorer.name}</h3>
-                    <p class="text-sm text-gray-600">${team ? team.name : 'N/A'}</p>
-                    <div class="mt-2 text-xs text-gray-500">
-                        <span>${translations[currentLanguage].mp}: ${scorer.matchesPlayed || 0}</span> |
-                        <span class="font-bold text-green-600">${translations[currentLanguage].g}: ${scorer.goals || 0}</span> |
-                        <span>${translations[currentLanguage].a}: ${scorer.assists || 0}</span>
-                    </div>
-                `;
-                scorersGrid.appendChild(card);
-            });
-        }
-
-        function renderUpcomingMatches() {
-            const matchesListDiv = document.getElementById('matches-list');
-            if (!matchesListDiv) return;
-            matchesListDiv.innerHTML = '';
-
-            if (allMatches.length === 0) {
-                matchesListDiv.innerHTML = `<p class="text-gray-600 text-center">${translations[currentLanguage].noUpcomingMatches}</p>`;
-                return;
-            }
-
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-
-            const currentDayOfWeek = today.getDay();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - currentDayOfWeek);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(startOfWeek.getDate() + 6);
-            endOfWeek.setHours(23,59,59,999);
-
-            const matchesThisWeek = allMatches.filter(match => {
-                const matchDate = new Date(match.date + 'T00:00:00');
-                return matchDate >= startOfWeek && matchDate <= endOfWeek;
-            });
-            
-            matchesThisWeek.sort((a,b) => {
-                const dateA = new Date(a.date + 'T' + a.time);
-                const dateB = new Date(b.date + 'T' + b.time);
-                return dateA - dateB;
-            });
-
-            if (matchesThisWeek.length === 0) {
-                matchesListDiv.innerHTML = `<p class="text-gray-600 text-center">${translations[currentLanguage].noUpcomingMatches}</p>`;
-                return;
-            }
-
-            const ul = document.createElement('ul');
-            ul.className = 'space-y-2 bg-white p-4 rounded-lg shadow';
-
-            matchesThisWeek.forEach(match => {
-                const team1 = getTeamById(match.homeTeamId);
-                const team2 = getTeamById(match.awayTeamId);
-                
-                const matchInfo = getMatchStatusAndDisplay(match);
-
-                const li = document.createElement('li');
-                li.className = 'flex justify-between items-center p-2 rounded-md hover:bg-gray-50 transition-colors';
-                
-                if (matchInfo.status === 'ongoing') {
-                    li.classList.add('bg-blue-50', 'border-l-4', 'border-blue-500');
-                }
-
-                li.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <img src="${team1 ? team1.logoUrl : ''}" alt="${team1 ? team1.name : 'N/A'}" class="w-5 h-5 rounded-full" onerror="this.src='https://placehold.co/40x40/CCCCCC/FFFFFF?text=N/A'"/>
-                        <span class="font-medium text-gray-700">${team1 ? team1.name : 'N/A'}</span>
-                        <span class="text-gray-500">${translations[currentLanguage].vs}</span>
-                        <img src="${team2 ? team2.logoUrl : ''}" alt="${team2 ? team2.name : 'N/A'}" class="w-5 h-5 rounded-full" onerror="this.src='https://placehold.co/40x40/CCCCCC/FFFFFF?text=N/A'"/>
-                        <span class="font-medium text-gray-700">${team2 ? team2.name : 'N/A'}</span>
-                    </div>
-                    <div class="text-right">
-                        ${matchInfo.status === 'ongoing' ?
-                            `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 animate-pulse">${translations[currentLanguage].live}</span>
-                             <span class="ml-2 text-lg font-bold text-blue-700">${matchInfo.scoreDisplay}</span>`
-                            : matchInfo.status === 'finished' ?
-                            `<span class="text-sm text-gray-500 font-semibold">${translations[currentLanguage].ft}</span>
-                             <span class="ml-1 text-base font-bold text-gray-800">${matchInfo.scoreDisplay}</span>`
-                            :
-                            `<span class="text-sm text-blue-600 font-semibold">${matchInfo.display}</span>`
-                        }
-                    </div>
-                `;
-                ul.appendChild(li);
-            });
-            matchesListDiv.appendChild(ul);
-        }
-
-        // --- FOOTER ---
-function updateFooter() {
-    const yearSpan = document.getElementById('current-year');
-    if (yearSpan) yearSpan.textContent = new Date().getFullYear();
-
-    const footerDateContainer = document.getElementById('footer-date-container');
-
-    // console.log('--- Footer Update Called ---'); // Keep for debugging if needed
-    // console.log('  1. footerDateContainer element:', footerDateContainer); // Keep for debugging if needed
-    // console.log('  2. lastUpdatedTimestamp value:', lastUpdatedTimestamp); // Keep for debugging if needed
-
-    if (footerDateContainer) {
-        if (lastUpdatedTimestamp) {
-            const lastUpdateDate = new Date(lastUpdatedTimestamp);
-            footerDateContainer.innerHTML = `${translations[currentLanguage].dataLastUpdatedPrefix} ${lastUpdateDate.toLocaleDateString(undefined, {
-                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
-            })}`;
-            // Removed: footerDateContainer.style.backgroundColor = 'yellow';
-            footerDateContainer.style.padding = '2px 5px'; // Keep if you like padding
-            footerDateContainer.style.borderRadius = '3px'; // Keep if you like rounded corners
-            // console.log('  3. Footer: Date applied.'); // Keep for debugging if needed
-        } else {
-            footerDateContainer.innerHTML = `${translations[currentLanguage].dataLastUpdatedPrefix} Not available`;
-            // Removed: footerDateContainer.style.backgroundColor = 'lightgray';
-            footerDateContainer.style.padding = '2px 5px'; // Keep if you like padding
-            footerDateContainer.style.borderRadius = '3px'; // Keep if you like rounded corners
-            // console.log('  3. Footer: Not available applied.'); // Keep for debugging if needed
-        }
-    } else {
-        console.error('  3. Footer: ERROR - "footer-date-container" element was NOT found in the DOM!');
-    }
-}
-
-        
-        // --- UI VISIBILITY FUNCTIONS ---
-        function showSection(sectionId) {
-            document.querySelectorAll('section').forEach(section => {
-                section.classList.add('hidden');
-            });
-            document.getElementById(sectionId).classList.remove('hidden');
-        }
-
-        function toggleLoginModal(show) {
-            const modal = document.getElementById('login-modal');
-            if (show) {
-                modal.classList.add('show');
-            } else {
-                modal.classList.remove('show');
-                document.getElementById('login-error-message').classList.add('hidden');
-            }
-        }
-
-        function openNav() {
-            document.getElementById("mySidenav").style.width = "250px";
-        }
-
-        function closeNav() {
-            document.getElementById("mySidenav").style.width = "0";
-        }
-
-        function updateAdminUI() {
-            const adminDashboardLink = document.getElementById('nav-admin-dashboard');
-            if (isAdmin) {
-                adminDashboardLink.classList.remove('hidden');
-            } else {
-                adminDashboardLink.classList.add('hidden');
-                if (!document.getElementById('admin-dashboard').classList.contains('hidden')) {
-                    showSection('upcoming-matches');
-                }
-            }
-        }
-
-        // --- AUTHENTICATION FUNCTIONS ---
-        async function handleLogin() {
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const errorMessageElement = document.getElementById('login-error-message');
-            errorMessageElement.classList.add('hidden');
-
+        // --- Firebase Initialization and Data Listeners ---
+        async function signInAndSetupListeners() {
             try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log("Logged in:", userCredential.user.uid);
-                toggleLoginModal(false);
-                closeNav();
-                // onAuthStateChanged listener will handle isAdmin check and UI update
-            } catch (error) {
-                console.error("Login error:", error.code, error.message);
-                let displayMessage = "Login failed. Please check your credentials.";
-                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-                    displayMessage = "Invalid email or password.";
-                } else if (error.code === 'auth/invalid-email') {
-                    displayMessage = "Invalid email format.";
-                } else if (error.code === 'auth/too-many-requests') {
-                    displayMessage = "Too many login attempts. Please try again later.";
-                }
-                errorMessageElement.textContent = displayMessage;
-                errorMessageElement.classList.remove('hidden');
-            }
-        }
-
-        async function checkAdminStatus(uid) {
-            try {
-                const configDocRef = doc(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/settings/config`);
-                const configSnap = await getDoc(configDocRef);
-                if (configSnap.exists()) {
-                    const configData = configSnap.data();
-                    adminUids = configData.adminUids || [];
-                    return adminUids.includes(uid);
-                }
-                return false;
-            } catch (error) {
-                console.error("Error checking admin status:", error);
-                return false;
-            }
-        }
-
-        // --- FETCH DATA FROM FIRESTORE ---
-        const LEAGUE_ID = 'hkpl'; // This should match your league ID in Firestore
-
-        async function fetchFirestoreData() {
-            if (!firebaseAppId) {
-                console.error("Firebase App ID is not set. Cannot fetch Firestore data.");
-                document.getElementById('matches-list').innerHTML = `<p class="text-red-500 text-center">Firebase not configured. Check console.</p>`;
-                document.getElementById('standings-body').innerHTML = `<tr><td colspan="10" class="text-red-500 text-center p-4">Firebase not configured.</td></tr>`;
-                document.getElementById('scorers-grid').innerHTML = `<p class="text-red-500 text-center col-span-full">Firebase not configured.</p>`;
-                return;
-            }
-
-            try {
-                // Fetch Teams
-                onSnapshot(collection(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/teams`), (snapshot) => {
-                    allTeams = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAllData();
-                    console.log("Teams fetched:", allTeams);
-                }, (error) => {
-                    console.error("Error fetching teams:", error);
-                    document.getElementById('standings-body').innerHTML = `<tr><td colspan="10" class="text-red-500 text-center p-4">Error loading teams.</td></tr>`;
-                });
-
-                // Fetch Players
-                onSnapshot(collection(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/players`), (snapshot) => {
-                    allPlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAllData();
-                    console.log("Players fetched:", allPlayers);
-                }, (error) => {
-                    console.error("Error fetching players:", error);
-                    document.getElementById('scorers-grid').innerHTML = `<p class="text-red-500 text-center col-span-full">Error loading players.</p>`;
-                });
-
-                // Fetch Matches
-                onSnapshot(collection(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/matches`), (snapshot) => {
-                    allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAllData();
-                    console.log("Matches fetched:", allMatches);
-                }, (error) => {
-                    console.error("Error fetching matches:", error);
-                    document.getElementById('matches-list').innerHTML = `<p class="text-red-500 text-center">Error loading matches.</p>`;
-                });
-
-                // Fetch Settings for last updated timestamp and admin UIDs
-                onSnapshot(doc(db, `/artifacts/${firebaseAppId}/public/data/leagues/${LEAGUE_ID}/settings/config`), (docSnap) => {
-                    if (docSnap.exists()) {
-                        const configData = docSnap.data();
-                        lastUpdatedTimestamp = configData.lastUpdated?.toDate() || null;
-                        adminUids = configData.adminUids || [];
-                        updateFooter();
-                        if (auth.currentUser) { // Re-check admin status if current user is logged in
-                            isAdmin = adminUids.includes(auth.currentUser.uid);
-                        } else { // If no user is logged in (public view)
-                            isAdmin = false;
-                        }
-                        updateAdminUI(); // Always update UI based on current isAdmin status
-                    } else {
-                        console.warn("No config document found in settings. Ensure you've created /artifacts/{appId}/public/data/leagues/{LEAGUE_ID}/settings/config in Firestore.");
-                        lastUpdatedTimestamp = null;
-                        adminUids = [];
-                        updateFooter();
-                        isAdmin = false;
-                        updateAdminUI();
-                    }
-                    console.log("Settings fetched. Last updated:", lastUpdatedTimestamp, "Admin UIDs:", adminUids);
-                }, (error) => {
-                    console.error("Error fetching settings:", error);
-                });
-
-            } catch (error) {
-                console.error("Error initializing Firestore data listeners:", error);
-            }
-        }
-
-        // --- RENDER ALL DATA ---
-        function renderAllData() {
-            renderUpcomingMatches();
-            renderStandings();
-            renderTopScorers();
-            updateFooter();
-        }
-
-        // --- INITIALIZE PAGE ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            setLanguage(currentLanguage);
-
-            document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
-            document.getElementById('lang-my').addEventListener('click', () => setLanguage('my'));
-
-            document.getElementById('hamburger-menu').addEventListener('click', openNav);
-            document.getElementById('close-nav').addEventListener('click', closeNav);
-            document.getElementById('nav-home').addEventListener('click', () => {
-                showSection('upcoming-matches');
-                closeNav();
-            });
-            document.getElementById('nav-login').addEventListener('click', () => {
-                toggleLoginModal(true);
-                closeNav();
-            });
-            document.getElementById('nav-admin-dashboard').addEventListener('click', () => {
-                showSection('admin-dashboard');
-                closeNav();
-            });
-
-            document.getElementById('close-login-modal').addEventListener('click', () => toggleLoginModal(false));
-            document.getElementById('login-button').addEventListener('click', handleLogin);
-
-            document.getElementById('manage-teams-btn').addEventListener('click', () => {
-                document.getElementById('admin-content-area').innerHTML = `<h3 class="text-xl font-semibold mb-2">Manage Teams</h3><p>Forms to add/edit/delete teams will go here.</p>`;
-            });
-            document.getElementById('manage-players-btn').addEventListener('click', () => {
-                document.getElementById('admin-content-area').innerHTML = `<h3 class="text-xl font-semibold mb-2">Manage Players</h3><p>Forms to add/edit/delete players will go here.</p>`;
-            });
-            document.getElementById('manage-matches-btn').addEventListener('click', () => {
-                document.getElementById('admin-content-area').innerHTML = `<h3 class="text-xl font-semibold mb-2">Manage Matches</h3><p>Forms to add/edit/delete matches will go here.</p>`;
-            });
-
-
-            // Initialize Firebase
-            try {
-                // *** PASTE YOUR FIREBASE CONFIG OBJECT HERE ***
-                const firebaseConfig = {
-                  apiKey: "AIzaSyDikFHg3TNUng-I9WgeTWXbO29SKxWNLZE",
-                  authDomain: "hkplweb.firebaseapp.com",
-                  projectId: "hkplweb",
-                  storageBucket: "hkplweb.firebasestorage.app",
-                  messagingSenderId: "1774261075",
-                  appId: "1:1774261075:web:cc26aa5d553dfd38ef87a6", // This is your 'measurementId' from Firebase Console web app settings
-                  measurementId: "G-XXXXXXXXXX" // Optional
-                };
-                // ********************************************
-
-                // Store appId globally for use in Firestore paths
-                firebaseAppId = firebaseConfig.projectId;
-
-                // Initialize Firebase app
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
-                auth = getAuth(app);
+                auth = getAuth(app); 
+                setLogLevel('debug'); // For development
 
-                // Listen for auth state changes (for admin login/logout)
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        // A user (potentially an admin) is logged in
-                        userId = user.uid;
-                        console.log("Firebase Authenticated. User ID:", userId);
-                        isAdmin = await checkAdminStatus(userId);
-                    } else {
-                        // No user is logged in (public view)
-                        console.log("Firebase Not Authenticated (public view).");
-                        userId = null;
-                        isAdmin = false;
-                    }
-                    updateAdminUI(); // Update UI based on current isAdmin status
-                    // Always fetch data regardless of authentication state, as read rules are public
-                    fetchFirestoreData();
-                });
+                // Data will be read based on Firebase Security Rules (e.g., allow public read).
+                setupFirestoreListeners();
+                console.log("Firebase initialized and Firestore listeners set up for public data access.");
 
             } catch (error) {
-                console.error("Failed to initialize Firebase:", error);
-                document.getElementById('matches-list').innerHTML = `<p class="text-red-500 text-center">Failed to load league data. Please check console for errors.</p>`;
-                document.getElementById('standings-body').innerHTML = `<tr><td colspan="10" class="text-red-500 text-center p-4">Failed to load league data.</td></tr>`;
-                document.getElementById('scorers-grid').innerHTML = `<p class="text-red-500 text-center col-span-full">Failed to load league data.</p>`;
+                console.error("Firebase initialization error:", error);
+                // Display error to user on the page
+                document.body.innerHTML = `<div class="p-4 text-red-500">Error initializing Firebase. Please check console. AppId: ${appId}</div>`;
             }
+        }
+
+        function setupFirestoreListeners() {
+            // Listener for League Details (e.g., LogoUrl)
+            const leagueDetailsPath = `artifacts/${appId}/public/data/leagues/hkpl`;
+            onSnapshot(doc(db, leagueDetailsPath), (docSnap) => {
+                if (docSnap.exists()) {
+                    leagueDetails = { id: docSnap.id, ...docSnap.data() };
+                    console.log("League details updated:", leagueDetails);
+                    renderLeagueHeader();
+                } else {
+                    console.log("No such league details document!");
+                    leagueDetails = {}; 
+                    renderLeagueHeader(); 
+                }
+            }, (error) => console.error("Error fetching league details:", error));
+
+            // Listener for Teams
+            const teamsPath = `artifacts/${appId}/public/data/leagues/hkpl/teams`;
+            onSnapshot(collection(db, teamsPath), (snapshot) => {
+                teamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Teams data updated:", teamsData);
+                renderLeagueStandings(teamsData);
+            }, (error) => console.error("Error fetching teams:", error));
+
+            // Listener for Matches
+            const matchesPath = `artifacts/${appId}/public/data/leagues/hkpl/matches`;
+            onSnapshot(collection(db, matchesPath), (snapshot) => {
+                const allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Matches data updated:", allMatches);
+
+                // Current time for filtering
+                const now = new Date(); 
+                const twelveHoursInMs = 12 * 60 * 60 * 1000;
+                const oneDayInMs = 24 * 60 * 60 * 1000;
+                const twelveHoursAgo = new Date(now.getTime() - twelveHoursInMs);
+                const oneDayAgo = new Date(now.getTime() - oneDayInMs);
+
+                const finishedMatches = allMatches.filter(m => {
+                    if (m.status !== 'finished') return false;
+                    const matchDateTimeStr = `${m.date}T${m.time || '00:00:00'}`;
+                    const matchDateTime = new Date(matchDateTimeStr);
+                    return matchDateTime < twelveHoursAgo && matchDateTime >= oneDayAgo;
+                }).sort((a,b) => new Date(`${b.date}T${b.time || '00:00:00'}`) - new Date(`${a.date}T${a.time || '00:00:00'}`));
+                
+                const upcomingMatches = allMatches
+                    .filter(m => m.status === 'upcoming')
+                    .sort((a,b) => new Date(a.date) - new Date(b.date) || (a.time || "00:00").localeCompare(b.time || "00:00"));
+
+                renderMatches(finishedMatches, 'finished');
+                renderMatches(upcomingMatches, 'upcoming');
+
+            }, (error) => console.error("Error fetching matches:", error));
+
+            // Listener for Players (Top Scorers)
+            const playersPath = `artifacts/${appId}/public/data/leagues/hkpl/players`;
+            onSnapshot(collection(db, playersPath), (snapshot) => {
+                const players = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                console.log("Players data updated:", players);
+                renderTopScorers(players);
+            }, (error) => console.error("Error fetching players:", error));
+            
+            // Listener for Settings (optional, if needed for UI)
+            const settingsPath = `artifacts/${appId}/public/data/leagues/hkpl/settings/config`;
+            onSnapshot(doc(db, settingsPath), (docSnap) => {
+                if (docSnap.exists()) {
+                    console.log("Settings updated:", docSnap.data());
+                } else {
+                    console.log("No such settings document!");
+                }
+            }, (error) => console.error("Error fetching settings:", error));
+        }
+
+
+        // --- INITIALIZE ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            signInAndSetupListeners(); 
+
+            // Mobile menu toggle
+            const menuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
         });
-
     </script>
-
 </body>
 </html>
