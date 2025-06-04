@@ -1,0 +1,114 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f7f8fc;
+    color: #1c1b1f;
+}
+.material-card {
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.05);
+    transition: all 0.3s ease-in-out;
+}
+.material-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08), 0 4px 8px rgba(0,0,0,0.08);
+}
+.table-header {
+    background-color: #e8eaf6;
+}
+.team-logo-sm { 
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+.team-logo-md { 
+    width: 32px; 
+    height: 32px; 
+    object-fit: contain;
+}
+.table-container {
+    overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* smoother scroll on iOS */
+  display: block; /* important for Firefox & Safari */
+    width: 100%;
+}
+.table-container table {
+  min-width: 950px; /* ensures the table is wide enough to scroll */
+  width: 100%;
+  table-layout: auto;
+}
+
+.responsive-table table {
+    width: 100%;
+    min-width: 700px;
+}
+
+@media screen and (max-width: 768px) {
+    .team-logo-sm {
+        width: 24px;
+        height: 24px;
+    }
+
+    .team-col {
+        min-width: 160px;
+        max-width: 160px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    th, td {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+}
+
+th, td {
+    white-space: nowrap;
+    text-align: left;
+}
+
+.loading-text {
+    text-align: center;
+    padding: 1rem;
+    color: #555;
+    font-style: italic;
+}
+
+.player-pic-sm {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid #e0e0e0;
+}
+.league-header-logo {
+    width: 48px; /* Same as SVG placeholder */
+    height: 48px;
+    object-fit: contain;
+    border-radius: 8px; /* Optional: if logos can be non-square */
+}
+.primary-accent { color: #3f51b5; }
+.secondary-accent { color: #7e57c2; }
+.header-gradient { background: linear-gradient(90deg, #4A00E0 0%, #8E2DE2 100%); }
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #333;
+}
+.match-score {
+    font-size: 1.1rem; 
+    font-weight: 600;
+    padding: 0.2rem 0.6rem; 
+    border-radius: 8px;
+    background-color: #e8eaf6;
+}
+.upcoming-badge, .finished-badge, .ongoing-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+.upcoming-badge { background-color: #ffeb3b; color: #333; }
+.finished-badge { background-color: #c8e6c9; color: #2e7d32; }
+.ongoing-badge { background-color: #ffcc80; color: #ef6c00; } /* Orange for ongoing */
