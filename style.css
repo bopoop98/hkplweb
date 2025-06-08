@@ -112,3 +112,65 @@ th, td {
 .upcoming-badge { background-color: #ffeb3b; color: #333; }
 .finished-badge { background-color: #c8e6c9; color: #2e7d32; }
 .ongoing-badge { background-color: #ffcc80; color: #ef6c00; } /* Orange for ongoing */
+
+/* ==========================
+   Enhanced Minimized Header Styles
+   ========================== */
+
+/* Base header styles */
+header {
+  transition: 
+    transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+    box-shadow 0.4s ease,
+    padding 0.4s ease;
+  will-change: transform;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* Minimized state styles */
+header.minimized {
+  padding-top: 0.5rem !important;
+  padding-bottom: 0.5rem !important;
+  transform: translateY(0); /* Needed for smooth transition */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  
+  /* Add subtle scaling effect for modern browsers */
+  @media (hover: hover) {
+    &:hover {
+      transform: scale(1.01);
+    }
+  }
+}
+
+/* Logo scaling */
+header.minimized img {
+  width: 32px !important;
+  height: 32px !important;
+  transition: transform 0.3s ease;
+}
+
+/* Text scaling with smooth transition */
+header.minimized h1 {
+  font-size: 1.25rem !important;
+  transition: 
+    font-size 0.4s cubic-bezier(0.33, 1, 0.68, 1),
+    letter-spacing 0.4s ease;
+  letter-spacing: -0.02em;
+}
+
+/* Optional: Add animation to navigation items */
+header.minimized nav a {
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+/* Touch-friendly active states */
+header.minimized:active {
+  transform: scale(0.98);
+}
+
+/* Maintain accessibility during scaling */
+header.minimized * {
+  transform: translateZ(0);
+}
+
