@@ -1,3 +1,55 @@
+// ==========================
+// Enhanced Scroll-Based Header Minimization
+// ==========================
+
+const header = document.querySelector('header');
+let lastScrollY = window.scrollY;
+let ticking = false;
+const SCROLL_DELTA = 10; // Minimum scroll distance to trigger changes
+const TOP_THRESHOLD = 50; // Pixels from top where header always shows
+const DEBOUNCE_DELAY = 100; // Delay after scroll stops to reset header
+
+function updateHeaderState() {
+    const currentScrollY = window.scrollY;
+    const scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
+    
+    // Always show header when at page top
+    if (currentScrollY <= TOP_THRESHOLD) {
+        header.classList.remove('minimized');
+    }
+    // Minimize only when scrolling down past threshold
+    else if (scrollDirection === 'down' && 
+             currentScrollY > TOP_THRESHOLD &&
+             Math.abs(currentScrollY - lastScrollY) > SCROLL_DELTA) {
+        header.classList.add('minimized');
+    }
+    // Show when scrolling up with significant delta
+    else if (scrollDirection === 'up' && 
+             Math.abs(currentScrollY - lastScrollY) > SCROLL_DELTA) {
+        header.classList.remove('minimized');
+    }
+
+    lastScrollY = currentScrollY;
+}
+
+// Throttled scroll handler
+window.addEventListener('scroll', () => {
+    if (!ticking) {
+        window.requestAnimationFrame(() => {
+            updateHeaderState();
+            ticking = false;
+        });
+        ticking = true;
+    }
+});
+
+// Reset header to visible when reaching top
+window.addEventListener('load', () => {
+    if (window.scrollY <= TOP_THRESHOLD) {
+        header.classList.remove('minimized');
+    }
+});
+
 // Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
