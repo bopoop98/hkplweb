@@ -174,3 +174,35 @@ header.minimized * {
   transform: translateZ(0);
 }
 
+ /* Tab styles */
+.tab-container {
+display: flex;
+border-bottom: 2px solid #e2e8f0;
+margin-bottom: 1.5rem;
+}
+.tab-btn {
+padding: 0.75rem 1.5rem;
+background: transparent;
+border: none;
+font-weight: 600;
+color: #718096;
+cursor: pointer;
+position: relative;
+transition: all 0.3s ease;
+}
+.tab-btn:hover {
+color: #4a00e0;
+}
+.tab-btn.active {
+color: #4a00e0;
+}
+.tab-btn.active::after {
+content: '';
+position: absolute;
+bottom: -2px;
+left: 0;
+right: 0;
+height: 3px;
+background-color: #4a00e0;
+border-radius: 3px 3px 0 0;
+}
