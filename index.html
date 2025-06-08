@@ -35,23 +35,28 @@
 
     <main class="container mx-auto p-4 md:p-8 space-y-12">
 
-        <section id="matches">
-            <h2 class="section-title primary-accent">Matches</h2>
-            <div id="finished-matches-container" class="mb-10">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Finished Matches (12-24 hours ago)</h3>
-                <div id="loading-finished-matches" class="loading-text">Loading finished matches...</div>
-                <div id="no-recent-finished-matches" class="material-card p-6 text-center text-gray-500 hidden">
-                    <p>*ယခု အသုံးပြုနေသော Website မှာ စမ်းသပ်ဆဲကာလ ဖြစ်၍ အမှားများပါဝင်နိုင်ပါသည်။*</p>
-                </div>
-            </div>
-            <div id="upcoming-matches-container">
-                <h3 class="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Upcoming Matches</h3>
-                <div id="loading-upcoming-matches" class="loading-text">Loading upcoming matches...</div>
-                <div id="no-upcoming-matches" class="material-card p-6 text-center text-gray-500 hidden">
-                    <p>No upcoming matches scheduled yet. Check back later!</p>
-                </div>
-            </div>
-        </section>
+<!-- Unified Matches Section -->
+<section id="matches">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="section-title primary-accent">Matches</h2>
+        <div class="tab-container">
+            <button data-tab="all" class="tab-btn active">All Matches</button>
+            <button data-tab="upcoming" class="tab-btn">Upcoming</button>
+            <button data-tab="ongoing" class="tab-btn">Ongoing</button>
+            <button data-tab="finished" class="tab-btn">Finished</button>
+        </div>
+    </div>
+
+    <div id="matches-container" class="space-y-4">
+        <!-- Matches will be rendered here based on selected tab -->
+    </div>
+    
+    <div id="no-matches" class="material-card p-6 text-center text-gray-500 hidden">
+        <p>No matches found for the selected filter.</p>
+    </div>
+    
+    <div id="loading-matches" class="loading-text">Loading matches...</div>
+</section>
 <section id="league-standings">
   <h2 class="section-title primary-accent">League Standings</h2>
   <div id="loading-standings" class="loading-text">Loading league standings...</div>
