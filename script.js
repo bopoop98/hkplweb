@@ -72,6 +72,24 @@ let app;
 let db;
 let auth;
 
+// Global matches storage
+let allMatches = [];
+let filteredMatches = [];
+
+// Tab switching functionality
+document.addEventListener('DOMContentLoaded', () => {
+    // ... existing code ...
+    
+    // Tab event listeners
+    document.querySelectorAll('.tab-btn').forEach(button => {
+        button.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            filterMatches(button.dataset.tab);
+        });
+    });
+});
+
 // Global data stores
 let teamsData = [];
 let leagueDetails = {};
@@ -80,6 +98,47 @@ let leagueDetails = {};
 const getTeamDataById = (id) => teamsData.find(team => team.id === id);
 const defaultLogoUrl = "https://placehold.co/40x40/CCCCCC/757575?text=N/A";
 const defaultPlayerImgUrl = "https://placehold.co/36x36/CCCCCC/757575?text=P";
+
+// Filter and render matches based on tab selection
+function filterMatches(tab) {
+    const now = new Date();
+    const twelveHoursInMs = 12 * 60 * 60 * 1000;
+    const oneDayInMs = 24 * 60 * 60 * 1000;
+    const twelveHoursAgo = new Date(now.getTime() - twelveHoursInMs);
+    const oneDayAgo = new Date(now.getTime() - oneDayInMs);
+    
+    switch(tab) {
+        case 'all':
+            filteredMatches = [...allMatches];
+            break;
+            
+        case 'upcoming':
+            filteredMatches = allMatches.filter(m => m.status === 'upcoming');
+            break;
+            
+        case 'ongoing':
+            filteredMatches = allMatches.filter(m => m.status === 'ongoing');
+            break;
+            
+        case 'finished':
+            filteredMatches = allMatches.filter(m => {
+                if (m.status !== 'finished') return false;
+                const [day, month, year] = m.date.split('-'); // This will now work as m.date is "DD-MM-YYYY"
+                const formattedDate = `${year}-${month}-${day}`;
+                const matchDateTimeStr = `${formattedDate}T${m.time || '00:00:00'}`;
+                const matchDateTime = new Date(matchDateTimeStr);
+
+                if (isNaN(matchDateTime.getTime())) return false;
+                return matchDateTime < twelveHoursAgo && matchDateTime >= oneDayAgo;
+            });
+            break;
+            
+        default:
+            filteredMatches = [...allMatches];
+    }
+    
+    renderMatches(filteredMatches);
+}
 
 
 // --- RENDER FUNCTIONS ---
@@ -96,72 +155,76 @@ function renderLeagueHeader() {
 }
 
 
-function renderMatches(matches, type) {
-    const finishedContainer = document.getElementById('finished-matches-container');
-    const upcomingContainer = document.getElementById('upcoming-matches-container');
-    const noUpcomingDiv = document.getElementById('no-upcoming-matches');
-    const noRecentFinishedDiv = document.getElementById('no-recent-finished-matches');
-    const loadingFinishedDiv = document.getElementById('loading-finished-matches');
-    const loadingUpcomingDiv = document.getElementById('loading-upcoming-matches');
+// Unified render function
+// --- RENDER FUNCTIONS ---
+function renderMatches(matches, type = 'all') {
+    const container = document.getElementById('matches-container');
+    const noMatchesDiv = document.getElementById('no-matches');
+    const loadingDiv = document.getElementById('loading-matches');
 
-    let container, noDataDiv, loadingDiv;
-
-    if (type === 'finished') {
-        container = finishedContainer;
-        noDataDiv = noRecentFinishedDiv;
-        loadingDiv = loadingFinishedDiv;
-        container.innerHTML = '<h3 class="text-xl font-semibold mb-6 text-gray-700 border-b pb-2">Finished Matches (12-24 hours ago)</h3>';
-    } else {
-        container = upcomingContainer;
-        noDataDiv = noUpcomingDiv;
-        loadingDiv = loadingUpcomingDiv;
-        container.innerHTML = '<h3 class="text-xl font-semibold mb-6 text-gray-700 border-b pb-2">Upcoming Matches</h3>';
+    // Safeguard against null elements - this is the critical part
+    if (!container) {
+        console.error("Error: 'matches-container' element is null. Cannot render matches.");
+        return; // Exit the function if container is null
     }
-
+    if (!noMatchesDiv) {
+        console.error("Error: 'no-matches' element is null. Some UI elements may not function correctly.");
+        // Do not return, as container might still be valid for rendering matches
+    }
+    if (!loadingDiv) {
+        console.error("Error: 'loading-matches' element is null. Some UI elements may not function correctly.");
+        // Do not return
+    }
+    
     loadingDiv.classList.add('hidden');
-
-    if (matches.length === 0) {
-        noDataDiv.classList.remove('hidden');
-        container.appendChild(noDataDiv);
+    container.innerHTML = '';
+    
+    if (!matches || matches.length === 0) {
+        noMatchesDiv.classList.remove('hidden');
         return;
     }
-    noDataDiv.classList.add('hidden');
-
-    if (type === 'finished') {
-        const groupedMatches = matches.reduce((acc, match) => {
-            // Ensure date is correctly parsed for display grouping
-            const [day, month, year] = match.date.split('-');
-            const formattedDateString = `${year}-${month}-${day}`;
-            const date = new Date(formattedDateString).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-            if (!acc[date]) acc[date] = [];
-            acc[date].push(match);
-            return acc;
-        }, {});
-
-        let matchesHTML = '';
-        for (const date in groupedMatches) {
-            const dateHeaderEl = document.createElement('h4');
-            dateHeaderEl.className = 'text-lg font-medium text-gray-600 mt-4 mb-2';
-            dateHeaderEl.textContent = date;
-            container.appendChild(dateHeaderEl);
-
-            groupedMatches[date].forEach(match => {
-                matchesHTML += generateMatchCardHTML(match);
-            });
-        }
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = matchesHTML;
-        while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
-
-    } else {
-        let matchesHTML = '';
-        matches.forEach(match => {
-            matchesHTML += generateMatchCardHTML(match);
+    
+    noMatchesDiv.classList.add('hidden');
+    
+    // Group matches by date
+    const groupedMatches = matches.reduce((acc, match) => {
+        const [day, month, year] = match.date.split('-');
+        const formattedDateString = `${year}-${month}-${day}`;
+        const date = new Date(formattedDateString).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
         });
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = matchesHTML;
-        while(tempDiv.firstChild) container.appendChild(tempDiv.firstChild);
-    }
+        
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(match);
+        return acc;
+    }, {});
+    
+// Render grouped matches
+for (const date in groupedMatches) {
+    const dateHeader = document.createElement('h3');
+    dateHeader.className = 'text-lg font-medium text-gray-600 mt-8 mb-4 pl-2 border-l-4 border-indigo-500';
+    dateHeader.textContent = date;
+    container.appendChild(dateHeader);
+    
+    groupedMatches[date].forEach(match => {
+        // 1. Define 'matchCardHtml' variable to store the generated HTML
+        const matchCardHtml = generateMatchCardHTML(match); 
+        
+        // 2. Create a new div element to hold the match card HTML
+        const matchElement = document.createElement('div');
+        
+        // 3. Assign the generated HTML string to the innerHTML of the new div
+        matchElement.innerHTML = matchCardHtml;
+        
+        // 4. Your console log will now correctly reference 'matchCardHtml'
+        console.log("Generated HTML for match:", matchCardHtml); 
+        
+        // 5. Append the entire 'matchElement' (the new div containing the card) to the container
+        container.appendChild(matchElement); 
+    });
+}
 }
 
 function generateMatchCardHTML(match) {
@@ -174,10 +237,9 @@ function generateMatchCardHTML(match) {
     }
 
     // Ensure date is correctly parsed for display
-    const [day, month, year] = match.date.split('-');
+	const [day, month, year] = match.date.split('-'); // This will also work correctly
     const formattedDateString = `${year}-${month}-${day}`;
     const matchDateStr = new Date(formattedDateString).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-
     let statusBadge = '';
     let scoreOrVs = '';
 
@@ -361,68 +423,32 @@ function setupFirestoreListeners() {
         renderLeagueStandings(teamsData);
     }, (error) => console.error("Error fetching teams for league standings:", error));
 
-    // Listener for Matches - UNCHANGED PATH
-    const matchesPath = `artifacts/${appId}/public/data/leagues/hkpl/matches`;
-    onSnapshot(collection(db, matchesPath), (snapshot) => {
-        const allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("Matches data updated:", allMatches);
+// Listener for Matches
+const matchesPath = `artifacts/${appId}/public/data/leagues/hkpl/matches`;
+onSnapshot(collection(db, matchesPath), (snapshot) => {
+    allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    console.log("Matches data updated:", allMatches);
 
-        // Current time for filtering
-        const now = new Date();
-        const twelveHoursInMs = 12 * 60 * 60 * 1000;
-        const oneDayInMs = 24 * 60 * 60 * 1000;
-        const twelveHoursAgo = new Date(now.getTime() - twelveHoursInMs);
-        const oneDayAgo = new Date(now.getTime() - oneDayInMs);
+    // Get the element directly here for the check
+    const matchesContainerElement = document.getElementById('matches-container');
+    console.log("matches-container status before filterMatches call in setupFirestoreListeners:", matchesContainerElement);
 
-        const finishedMatches = allMatches.filter(m => {
-            if (m.status !== 'finished') return false;
-            const [day, month, year] = m.date.split('-');
-            const formattedDate = `${year}-${month}-${day}`; // Convert to YYYY-MM-DD
-            const matchDateTimeStr = `${formattedDate}T${m.time || '00:00:00'}`;
-            const matchDateTime = new Date(matchDateTimeStr);
-
-            if (isNaN(matchDateTime.getTime())) { // Check for invalid date
-                console.error("Invalid date encountered for match:", m.id, "Date string:", matchDateTimeStr);
-                return false; // Skip this match if date is invalid
+    if (matchesContainerElement) {
+        // If the element exists, call filterMatches directly
+        filterMatches('all');
+    } else {
+        // If not ready, log a message and wait briefly to retry
+        console.warn("matches-container not found on initial Firestore snapshot. Retrying in 100ms...");
+        setTimeout(() => {
+            // After delay, re-check and call filterMatches if still null
+            if (document.getElementById('matches-container')) {
+                filterMatches('all');
+            } else {
+                console.error("matches-container still not found after retry. Matches will not be rendered.");
             }
-            return matchDateTime < twelveHoursAgo && matchDateTime >= oneDayAgo;
-        }).sort((a,b) => {
-            const [b_day, b_month, b_year] = b.date.split('-');
-            const b_formattedDate = `${b_year}-${b_month}-${b_day}`;
-            const b_dateTime = new Date(`${b_formattedDate}T${b.time || '00:00:00'}`);
-
-            const [a_day, a_month, a_year] = a.date.split('-');
-            const a_formattedDate = `${a_year}-${a_month}-${a_day}`;
-            const a_dateTime = new Date(`${a_formattedDate}T${a.time || '00:00:00'}`);
-
-            return b_dateTime - a_dateTime;
-        });
-
-        const upcomingMatches = allMatches
-            .filter(m => m.status === 'upcoming')
-            .sort((a,b) => {
-                const [b_day, b_month, b_year] = b.date.split('-');
-                const b_formattedDate = `${b_year}-${b_month}-${b_day}`;
-                const b_dateTime = new Date(`${b_formattedDate}T${b.time || '00:00:00'}`);
-
-                const [a_day, a_month, a_year] = a.date.split('-');
-                const a_formattedDate = `${a_year}-${a_month}-${a_day}`;
-                const a_dateTime = new Date(`${a_formattedDate}T${a.time || '00:00:00'}`);
-
-                return a_dateTime - b_dateTime;
-            });
-
-        console.log("All raw matches:", allMatches);
-        console.log("Current time:", now.toISOString());
-        console.log("12 hours ago:", new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString());
-        console.log("24 hours ago:", new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString());
-        console.log("Filtered finished matches:", finishedMatches);
-        console.log("Filtered upcoming matches:", upcomingMatches);
-
-        renderMatches(finishedMatches, 'finished');
-        renderMatches(upcomingMatches, 'upcoming');
-
-    }, (error) => console.error("Error fetching matches:", error));
+        }, 100);
+    }
+}, (error) => console.error("Error fetching matches:", error));
 
     // Listener for Players (Top Scorers) - UNCHANGED PATH
     const playersPath = `artifacts/${appId}/public/data/leagues/hkpl/players`;
