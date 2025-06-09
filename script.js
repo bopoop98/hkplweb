@@ -7,7 +7,7 @@
             const scrollThreshold = 50; // Pixels to scroll before shrinking
             let isThrottled = false;
             
-            // Function to adjust padding-top of body to prevent content overlap
+            // Function to adjust padding-top of body to prevent content 
             function adjustBodyPadding() {
                 $('body').css('padding-top', header.outerHeight() + 'px');
             }
@@ -34,19 +34,18 @@
             
             // Event listeners
             $(window).on('scroll', throttledScroll);
-            
             // Adjust body padding on window resize
             $(window).on('resize', adjustBodyPadding);
-
             // Initial checks on page load
-            adjustBodyPadding(); // Set initial padding
-            updateHeaderState(); // Set initial header state based on current scroll position
+            adjustBodyPadding();
+            // Set initial padding
+            updateHeaderState();
+            // Set initial header state based on current scroll position
 
             // Mobile menu toggle logic
             $('#mobile-menu-button').on('click', function() {
                 $('#mobile-menu').slideToggle();
             });
-
             // Hide mobile menu when a link is clicked
             $('#mobile-menu a').on('click', function() {
                 $('#mobile-menu').slideUp();
@@ -56,8 +55,7 @@
 // Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-import { getFirestore, doc, onSnapshot, collection, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+import { getFirestore, doc, onSnapshot, collection, setLogLevel, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 // Firebase config and App ID (now hardcoded for GitHub Pages)
 const firebaseConfig = {
     apiKey: "AIzaSyDikFHg3TNUng-I9WgeTWXbO29SKxWNLZE",
@@ -68,7 +66,7 @@ const firebaseConfig = {
     appId: "1:1774261075:web:cc26aa5d553dfd38ef87a6",
     measurementId: "G-XXXXXXXXXX"
 };
-const appId = "hkplweb";
+const appId = "hkplweb"; // Use this consistent appId for paths
 
 // Initialize Firebase
 let app;
@@ -92,11 +90,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-
 // Global data stores
 let teamsData = [];
 let leagueDetails = {};
-
 // Utility to get team data by ID
 const getTeamDataById = (id) => teamsData.find(team => team.id === id);
 const defaultLogoUrl = "https://placehold.co/40x40/CCCCCC/757575?text=N/A";
@@ -109,7 +105,6 @@ function filterMatches(tab) {
     const oneDayInMs = 24 * 60 * 60 * 1000;
     const twelveHoursAgo = new Date(now.getTime() - twelveHoursInMs);
     const oneDayAgo = new Date(now.getTime() - oneDayInMs);
-    
     switch(tab) {
         case 'all':
             filteredMatches = [...allMatches];
@@ -144,6 +139,177 @@ function filterMatches(tab) {
 }
 
 
+// ==========================
+// Dynamic Content Rendering Functions
+// ==========================
+
+// Helper to format date
+const formatDate = (timestamp) => {
+    if (!timestamp || typeof timestamp.toDate !== 'function') {
+        return 'N/A'; // Return 'N/A' or an empty string if timestamp is invalid
+    }
+    const date = timestamp.toDate();
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+};
+
+// Function to convert plain text with newlines to HTML paragraphs and line breaks
+function formatPlainTextToHtml(text) {
+    if (!text) return '';
+
+    // Split the text into paragraphs based on two or more newline characters
+    const paragraphs = text.split(/\n\s*\n/);
+
+    const htmlParagraphs = paragraphs.map(p => {
+        // Trim whitespace from the paragraph
+        const trimmedParagraph = p.trim();
+        if (trimmedParagraph === '') {
+            return ''; // Skip empty paragraphs that might result from splitting
+        }
+        // Replace single newlines within a paragraph with <br> tags
+        return `<p>${trimmedParagraph.replace(/\n/g, '<br>')}</p>`;
+    });
+
+    // Join all formatted paragraphs. Filter out any empty strings from skipped paragraphs.
+    return htmlParagraphs.filter(Boolean).join('');
+}
+
+
+// --- Render News Items ---
+function renderNews(newsItems) {
+    const newsContainer = document.getElementById('news-container');
+    const loadingNews = document.getElementById('loading-news');
+    const noNews = document.getElementById('no-news');
+
+    loadingNews.classList.add('hidden');
+
+    if (newsItems.length === 0) {
+        noNews.classList.remove('hidden');
+        newsContainer.innerHTML = '';
+        return;
+    }
+
+    noNews.classList.add('hidden');
+    newsContainer.innerHTML = ''; // Clear previous news
+
+    // Safely sort news items by date
+    newsItems.sort((a, b) => {
+        // Ensure 'date' property exists and is a Firestore Timestamp object
+        const dateA = a.date && typeof a.date.toMillis === 'function' ? a.date.toMillis() : 0;
+        const dateB = b.date && typeof b.date.toMillis === 'function' ? b.date.toMillis() : 0;
+        // Sort in descending order (newest first)
+        return dateB - dateA;
+    });
+
+    newsItems.forEach(news => {
+        const newsCard = document.createElement('div');
+        // Add data-news-id directly to the news card for clickability
+        newsCard.className = 'news-card material-card cursor-pointer'; // Add cursor-pointer for visual cue
+        newsCard.dataset.newsId = news.id; // Assign news ID to the card
+
+        const tagsHtml = news.tags ? news.tags.map(tag => `<span class="news-tag tag-${tag.toLowerCase()}">${tag}</span>`).join('') : '';
+
+        newsCard.innerHTML = `
+            <img src="${news.imgUrl && news.imgUrl.length > 0 ? news.imgUrl[0] : 'https://placehold.co/600x400/E0E0E0/4A00E0?text=No+Image'}" alt="${news.title}" class="news-image">
+            <div class="p-4 flex-grow flex flex-col">
+                <div class="news-tags-container">${tagsHtml}</div>
+                <h3 class="news-title">${news.title}</h3>
+                <div class="news-meta">
+                    <span>${news.date ? formatDate(news.date) : 'N/A'}</span>
+                    <span class="news-author">by ${news.author || 'Admin'}</span>
+                </div>
+                <div class="mt-auto pt-4">
+                    <button class="read-more-btn primary-btn">Read More</button>
+                </div>
+            </div>
+        `;
+        newsContainer.appendChild(newsCard);
+
+        // Add event listener directly to each news card for the full clickability
+        newsCard.addEventListener('click', (event) => {
+            const newsId = event.currentTarget.dataset.newsId; // Get ID from the clicked card
+            history.pushState({ newsId: newsId }, `News - ${newsId}`, `?news=${newsId}`);
+            showFullNewsArticle(newsId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    });
+}
+
+// --- Render Full News Article ---
+function renderNewsDetail(newsData) {
+    document.getElementById('news-detail-title').textContent = newsData.title;
+    document.getElementById('news-detail-author').querySelector('span').textContent = newsData.author || 'Admin';
+    document.getElementById('news-detail-date').textContent = formatDate(newsData.date);
+
+    const tagsContainer = document.getElementById('news-detail-tags');
+    tagsContainer.innerHTML = '';
+    if (newsData.tags) {
+        newsData.tags.forEach(tag => {
+            const tagSpan = document.createElement('span');
+            tagSpan.className = `news-tag tag-${tag.toLowerCase()}`;
+            tagSpan.textContent = tag;
+            tagsContainer.appendChild(tagSpan);
+        });
+    }
+
+    const imagesContainer = document.getElementById('news-detail-images');
+    imagesContainer.innerHTML = '';
+    if (newsData.imgUrl && newsData.imgUrl.length > 0) {
+        newsData.imgUrl.forEach(url => {
+            const imageWrapper = document.createElement('div');
+            imageWrapper.className = 'news-detail-image-item material-card rounded-lg shadow-md overflow-hidden';
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = newsData.title;
+            img.className = 'w-full h-auto block';
+            imageWrapper.appendChild(img);
+            imagesContainer.appendChild(imageWrapper);
+        });
+    }
+
+    // Use the new formatting function for the body content
+    document.getElementById('news-detail-body').innerHTML = formatPlainTextToHtml(newsData.body);
+}
+
+// --- Show/Hide News Sections ---
+function showFullNewsArticle(newsId) {
+    document.getElementById('news').classList.add('hidden');
+    document.getElementById('full-news-article').classList.remove('hidden');
+    document.getElementById('loading-news').classList.remove('hidden'); // Show loading for full article fetch
+
+    const newsDetailContent = document.getElementById('news-detail-content');
+    newsDetailContent.classList.add('hidden'); // Hide content while loading
+
+    const newsDocRef = doc(db, `artifacts/${appId}/public/data/leagues/hkpl/news`, newsId);
+    getDoc(newsDocRef).then((docSnap) => {
+        document.getElementById('loading-news').classList.add('hidden'); // Hide loading
+
+        if (docSnap.exists()) {
+            const newsData = docSnap.data();
+            renderNewsDetail(newsData);
+            newsDetailContent.classList.remove('hidden'); // Show content
+        } else {
+            console.error("No such news document!");
+            // Optionally, display a "News not found" message
+            newsDetailContent.innerHTML = '<p class="text-center text-red-500">News article not found.</p>';
+            newsDetailContent.classList.remove('hidden');
+        }
+    }).catch(error => {
+        console.error("Error fetching news document:", error);
+        document.getElementById('loading-news').classList.add('hidden');
+        newsDetailContent.innerHTML = '<p class="text-center text-red-500">Error loading news article.</p>';
+        newsDetailContent.classList.remove('hidden');
+    });
+}
+
+function hideFullNewsArticle() {
+    document.getElementById('full-news-article').classList.add('hidden');
+    document.getElementById('news').classList.remove('hidden');
+    history.pushState(null, 'Hsig Khaung Premier League News', 'index.html#news');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
 // --- RENDER FUNCTIONS ---
 function renderLeagueHeader() {
     const leagueLogoHeader = document.getElementById('leagueLogoHeader');
@@ -157,9 +323,7 @@ function renderLeagueHeader() {
     leagueNameHeader.textContent = leagueDetails.name || "Hsig Khaung Premier League";
 }
 
-
 // Unified render function
-// --- RENDER FUNCTIONS ---
 function renderMatches(matches, type = 'all') {
     const container = document.getElementById('matches-container');
     const noMatchesDiv = document.getElementById('no-matches');
@@ -181,7 +345,6 @@ function renderMatches(matches, type = 'all') {
     
     loadingDiv.classList.add('hidden');
     container.innerHTML = '';
-    
     if (!matches || matches.length === 0) {
         noMatchesDiv.classList.remove('hidden');
         return;
@@ -203,44 +366,42 @@ function renderMatches(matches, type = 'all') {
         acc[date].push(match);
         return acc;
     }, {});
-    
-// Render grouped matches
-for (const date in groupedMatches) {
-    const dateHeader = document.createElement('h3');
-    dateHeader.className = 'text-lg font-medium text-gray-600 mt-8 mb-4 pl-2 border-l-4 border-indigo-500';
-    dateHeader.textContent = date;
-    container.appendChild(dateHeader);
-    
-    groupedMatches[date].forEach(match => {
-        // 1. Define 'matchCardHtml' variable to store the generated HTML
-        const matchCardHtml = generateMatchCardHTML(match); 
-        
-        // 2. Create a new div element to hold the match card HTML
-        const matchElement = document.createElement('div');
-        
-        // 3. Assign the generated HTML string to the innerHTML of the new div
-        matchElement.innerHTML = matchCardHtml;
-        
-        // 4. Your console log will now correctly reference 'matchCardHtml'
-        console.log("Generated HTML for match:", matchCardHtml); 
-        
-        // 5. Append the entire 'matchElement' (the new div containing the card) to the container
-        container.appendChild(matchElement); 
-    });
-}
+    // Render grouped matches
+    for (const date in groupedMatches) {
+        const dateHeader = document.createElement('h3');
+        dateHeader.className = 'text-lg font-medium text-gray-600 mt-8 mb-4 pl-2 border-l-4 border-indigo-500';
+        dateHeader.textContent = date;
+        container.appendChild(dateHeader);
+        groupedMatches[date].forEach(match => {
+            // 1. Define 'matchCardHtml' variable to store the generated HTML
+            const matchCardHtml = generateMatchCardHTML(match); 
+            
+            // 2. Create a new div element to hold the match card HTML
+            const matchElement = document.createElement('div');
+            
+            // 3. Assign the generated HTML string to the innerHTML of the new div
+            matchElement.innerHTML = matchCardHtml;
+            
+            // 4. Your console log will now correctly reference 'matchCardHtml'
+            console.log("Generated HTML for match:", matchCardHtml); 
+            
+            // 5. Append the entire 'matchElement' (the new div containing the card) to the container
+            container.appendChild(matchElement); 
+        });
+    }
 }
 
 function generateMatchCardHTML(match) {
     const homeTeam = getTeamDataById(match.homeTeamId);
     const awayTeam = getTeamDataById(match.awayTeamId);
-
     if (!homeTeam || !awayTeam) {
         console.warn("Team data missing for match:", match.id, "Home:", match.homeTeamId, "Away:", match.awayTeamId);
         return `<div class="material-card p-4 mb-3 text-red-500">Error: Team data missing for this match.</div>`;
     }
 
     // Ensure date is correctly parsed for display
-	const [day, month, year] = match.date.split('-'); // This will also work correctly
+	const [day, month, year] = match.date.split('-');
+    // This will also work correctly
     const formattedDateString = `${year}-${month}-${day}`;
     const matchDateStr = new Date(formattedDateString).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     let statusBadge = '';
@@ -295,7 +456,6 @@ function renderLeagueStandings(teams) {
     loadingDiv.classList.add('hidden');
     cardDiv.classList.remove('hidden');
     tbody.innerHTML = '';
-
     if (!teams || teams.length === 0) {
         tbody.innerHTML = `<tr><td colspan="11" class="text-center py-4">No teams found or data is loading.</td></tr>`;
         return;
@@ -306,7 +466,6 @@ function renderLeagueStandings(teams) {
         const pts = (team.won || 0) * 3 + (team.draw || 0);
         return { ...team, gd, pts };
     }).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name));
-
     let rowsHTML = '';
     standings.forEach((team, index) => {
         rowsHTML += `
@@ -337,7 +496,6 @@ function renderTopScorers(players) {
     loadingDiv.classList.add('hidden');
     cardDiv.classList.remove('hidden');
     tbody.innerHTML = '';
-
     if (!players || players.length === 0) {
         noTopScorersDiv.classList.remove('hidden');
         tbody.closest('.table-container').classList.add('hidden');
@@ -350,7 +508,6 @@ function renderTopScorers(players) {
     const sortedScorers = players
         .filter(p => (p.goals || 0) > 0)
         .sort((a, b) => (b.goals || 0) - (a.goals || 0) || (b.assists || 0) - (a.assists || 0) || (a.matchesPlayed || 0) - (b.matchesPlayed || 0));
-
     if (sortedScorers.length === 0) {
         noTopScorersDiv.classList.remove('hidden');
         tbody.closest('.table-container').classList.add('hidden');
@@ -414,7 +571,6 @@ function setupFirestoreListeners() {
             renderLeagueHeader();
         }
     }, (error) => console.error("Error fetching league details:", error));
-
     //## Modified Team Data Fetching
 
     // Listener for Teams - MODIFIED PATH FOR LEAGUE STANDINGS
@@ -425,33 +581,41 @@ function setupFirestoreListeners() {
         console.log("Teams data updated (for standings):", teamsData);
         renderLeagueStandings(teamsData);
     }, (error) => console.error("Error fetching teams for league standings:", error));
+    // Listener for Matches
+    const matchesPath = `artifacts/${appId}/public/data/leagues/hkpl/matches`;
+    onSnapshot(collection(db, matchesPath), (snapshot) => {
+        allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log("Matches data updated:", allMatches);
 
-// Listener for Matches
-const matchesPath = `artifacts/${appId}/public/data/leagues/hkpl/matches`;
-onSnapshot(collection(db, matchesPath), (snapshot) => {
-    allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    console.log("Matches data updated:", allMatches);
+        // Get the element directly here for the check
+        const matchesContainerElement = document.getElementById('matches-container');
+        console.log("matches-container status before filterMatches call in setupFirestoreListeners:", matchesContainerElement);
 
-    // Get the element directly here for the check
-    const matchesContainerElement = document.getElementById('matches-container');
-    console.log("matches-container status before filterMatches call in setupFirestoreListeners:", matchesContainerElement);
+        if (matchesContainerElement) {
+            // If the element exists, call filterMatches directly
+            filterMatches('all');
+        } else {
+            // If not ready, log a message and wait briefly to retry
+            console.warn("matches-container not found on initial Firestore snapshot. Retrying in 100ms...");
+            setTimeout(() => {
+                // After delay, re-check and call filterMatches if still null
+                if (document.getElementById('matches-container')) {
+                    filterMatches('all');
+                } else {
+                    console.error("matches-container still not found after retry. Matches will not be rendered.");
+                }
+            }, 100);
+        }
+    }, (error) => console.error("Error fetching matches:", error));
 
-    if (matchesContainerElement) {
-        // If the element exists, call filterMatches directly
-        filterMatches('all');
-    } else {
-        // If not ready, log a message and wait briefly to retry
-        console.warn("matches-container not found on initial Firestore snapshot. Retrying in 100ms...");
-        setTimeout(() => {
-            // After delay, re-check and call filterMatches if still null
-            if (document.getElementById('matches-container')) {
-                filterMatches('all');
-            } else {
-                console.error("matches-container still not found after retry. Matches will not be rendered.");
-            }
-        }, 100);
-    }
-}, (error) => console.error("Error fetching matches:", error));
+
+    // Listener for News
+    const newsPath = `artifacts/${appId}/public/data/leagues/hkpl/news`; // Path to your news collection
+    onSnapshot(collection(db, newsPath), (snapshot) => {
+        const newsItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        console.log("News data updated:", newsItems); // For debugging
+        renderNews(newsItems); // Call the renderNews function with the fetched data
+    }, (error) => console.error("Error fetching news:", error));
 
     // Listener for Players (Top Scorers) - UNCHANGED PATH
     const playersPath = `artifacts/${appId}/public/data/leagues/hkpl/players`;
@@ -485,4 +649,25 @@ document.addEventListener('DOMContentLoaded', () => {
     menuButton.addEventListener('click', () => {
         mobileMenu.classList.toggle('hidden');
     });
+
+    // Back to News button listener
+    document.getElementById('back-to-news-btn').addEventListener('click', hideFullNewsArticle);
+
+    // Handle initial URL to check for news ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const newsIdFromUrl = urlParams.get('news');
+    if (newsIdFromUrl) {
+        showFullNewsArticle(newsIdFromUrl);
+    }
+});
+// Handle browser's back/forward buttons
+window.addEventListener('popstate', (event) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const newsIdFromUrl = urlParams.get('news');
+
+    if (newsIdFromUrl) {
+        showFullNewsArticle(newsIdFromUrl);
+    } else {
+        hideFullNewsArticle(); // If no news ID, go back to main news list
+    }
 });
