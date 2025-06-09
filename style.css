@@ -114,8 +114,8 @@ th, td {
 .ongoing-badge { background-color: #ffcc80; color: #ef6c00; } /* Orange for ongoing */
 
 /* ==========================
-   Enhanced Minimized Header Styles
-   ========================== */
+           Enhanced Minimized Header Styles
+           ========================== */
 
         /* Base header styles */
         header {
@@ -234,4 +234,219 @@ th, td {
         padding: 0.5rem 1rem;
         font-size: 0.85rem;
     }
+}
+
+/* News Section Grid Layout */
+div#news-container.news-grid {
+    display: grid;
+    /* Default for smaller screens (before media query): 1 column grid */
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+/* General news image styling (applies to desktop and larger screens by default) */
+.news-image {
+    width: 100%; /* Ensures image fills the width of its parent card */
+    height: 250px; /* Set a consistent height for all images on desktop */
+    object-fit: cover; /* Ensures images cover the area without distortion, cropping as needed */
+    /* Add border-radius to match the card's top corners */
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+/* For medium screens (e.g., tablets): 2 columns */
+@media (min-width: 768px) {
+    div#news-container.news-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* For larger screens (e.g., desktops): 3 columns */
+@media (min-width: 1024px) {
+    div#news-container.news-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+
+/* === Mobile-Specific Styles for News Section === */
+@media (max-width: 767px) {
+    div#news-container.news-grid {
+        display: flex;
+        grid-template-columns: unset;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        /* Adjust padding to align first card correctly and create space for scrolling */
+        /* Increased right padding to ensure next card peeks */
+        padding: 0 1rem 1rem 1rem;
+        margin-left: -1rem;
+        margin-right: -1rem;
+    }
+
+    /* Hide scrollbar for Webkit browsers (Chrome, Safari) */
+    .news-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .news-card {
+        flex-shrink: 0;
+        /* Adjusted width to show a bit of the next news item */
+        /* Each card will take up 85% of the viewport width, creating a peek of the next card */
+        width: calc(85vw - 2rem); 
+        scroll-snap-align: start;
+        margin-right: 1rem; /* Space between cards */
+    }
+
+    /* Make image and content smaller on mobile */
+    .news-image {
+        height: 180px; /* Increased height slightly from 120px to 150px for better proportion */
+        object-fit: cover; 
+    }
+
+    .news-content {
+        padding: 0.75rem;
+    }
+    .news-content h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    .news-meta {
+        padding-top: 0.5rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Full News Article Image Styling */
+#news-detail-images {
+    display: flex;
+    gap: 1rem; /* Spacing between image cards */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    scroll-snap-type: x mandatory; /* Optional: Snap scrolling for a smoother swipe experience */
+    -webkit-overflow-scrolling: touch; /* Enable smooth scrolling on iOS */
+    padding-bottom: 1rem; /* Space for scrollbar */
+    padding-left: 1rem; /* Padding at the start of the scrollable area */
+    padding-right: 1rem; /* Padding at the end of the scrollable area */
+    /* Use negative margins to pull the scrollable content to the edge on mobile */
+    margin-left: -1rem; 
+    margin-right: -1rem;
+}
+
+.news-detail-image-item {
+    flex: 0 0 auto; /* Do not grow or shrink, maintain explicit dimensions */
+    width: 90vw; /* Take up 90% of viewport width on mobile (e.g., 360px on a 400px wide screen) */
+    max-width: 400px; /* Maximum width for each image card */
+    height: 220px; /* Fixed height for image card on mobile */
+    scroll-snap-align: start; /* Align item to the start when snapping */
+    /* Ensure material-card styles are applied, like border-radius and shadow */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.news-detail-image-item img {
+    width: 100%; /* Image fills the width of its container */
+    height: 100%; /* Image fills the fixed height of its container */
+    object-fit: cover; /* Ensures the image covers the area, cropping if necessary */
+    object-position: center; /* Centers the image within its container */
+    display: block; /* Removes any default inline-block spacing issues */
+}
+
+/* Responsive adjustments for larger screens */
+@media (min-width: 768px) {
+    #news-detail-images {
+        overflow-x: hidden; /* Hide horizontal scroll on tablets/desktops */
+        scroll-snap-type: none; /* Disable snap scrolling */
+        justify-content: center; /* Center images if they don't fill the row */
+        flex-wrap: wrap; /* Allow images to wrap to the next line for a grid layout */
+        padding-left: 0; /* Remove mobile specific padding */
+        padding-right: 0;
+        margin-left: 0; /* Remove mobile specific negative margins */
+        margin-right: 0;
+    }
+    .news-detail-image-item {
+        width: calc(33.33% - 1rem); /* Approx. 3 images per row, accounting for gap */
+        height: 250px; /* Slightly taller on tablets */
+        max-width: 350px; /* Adjust max width for larger screens */
+    }
+}
+
+@media (min-width: 1024px) {
+    .news-detail-image-item {
+        width: calc(25% - 1rem); /* Approx. 4 images per row, accounting for gap */
+        height: 250px; /* Taller on desktop */
+        max-width: 400px; /* Adjust max width */
+    }
+}
+
+/* Tags Styling */
+/* News Tag Container */
+.news-tags-container {
+    display: flex; /* Use flexbox to keep tags in a row */
+    flex-wrap: wrap; /* Allow tags to wrap to the next line if needed */
+    gap: 0.5rem; /* Space between tags */
+    margin-bottom: 0.5rem; /* Space below the tags */
+}
+
+/* Tags Styling - Ensure this is present and correct */
+.news-tag {
+    display: inline-block; /* Crucial for sizing to content */
+    padding: 0.25rem 0.6rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: capitalize;
+    color: #fff;
+    background-color: #6b7280; /* Default gray background */
+    /* Remove margin-right if you're using gap on the container */
+    margin-right: 0; 
+}
+
+/* Specific Tag Colors */
+.tag-announcement {
+    background-color: #ef4444; /* Red */
+}
+
+.tag-match {
+    background-color: #22c55e; /* Green */
+}
+
+.tag-team {
+    background-color: #3b82f6; /* Blue */
+}
+/* Add/Modify these styles for .primary-btn to make it look like a clear button */
+.primary-btn {
+    display: inline-block; /* Essential for padding/margin to work */
+    padding: 0.75rem 1.5rem; /* Vertical and horizontal padding */
+    background-color: #4A00E0; /* A strong primary color, e.g., deep indigo */
+    color: #ffffff; /* White text */
+    border: none;
+    border-radius: 9999px; /* Fully rounded corners */
+    font-size: 1rem;
+    font-weight: 600; /* Bolder text */
+    text-align: center;
+    text-decoration: none; /* Ensure no underline if it's a link styled as button */
+    cursor: pointer; /* Indicates it's clickable */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.1s ease; /* Smooth transitions for hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06); /* Subtle shadow for depth */
+}
+
+.primary-btn:hover {
+    background-color: #5d1be8; /* Slightly lighter on hover */
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), 0 3px 6px rgba(0, 0, 0, 0.08); /* More prominent shadow on hover */
+    transform: translateY(-1px); /* Slight lift effect */
+}
+
+.primary-btn:active {
+    background-color: #3b00b0; /* Darker when clicked */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transform: translateY(0); /* Press down effect */
+}
+
+/* Add this to indicate the news card is clickable */
+.news-card.cursor-pointer {
+    cursor: pointer;
 }
