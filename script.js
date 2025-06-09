@@ -2,53 +2,56 @@
 // Enhanced Scroll-Based Header Minimization
 // ==========================
 
-const header = document.querySelector('header');
-let lastScrollY = window.scrollY;
-let ticking = false;
-const SCROLL_DELTA = 10; // Minimum scroll distance to trigger changes
-const TOP_THRESHOLD = 50; // Pixels from top where header always shows
-const DEBOUNCE_DELAY = 100; // Delay after scroll stops to reset header
+        $(document).ready(function() {
+            const header = $('#main-header');
+            const scrollThreshold = 50; // Pixels to scroll before shrinking
+            let isThrottled = false;
+            
+            // Function to adjust padding-top of body to prevent content overlap
+            function adjustBodyPadding() {
+                $('body').css('padding-top', header.outerHeight() + 'px');
+            }
 
-function updateHeaderState() {
-    const currentScrollY = window.scrollY;
-    const scrollDirection = currentScrollY > lastScrollY ? 'down' : 'up';
-    
-    // Always show header when at page top
-    if (currentScrollY <= TOP_THRESHOLD) {
-        header.classList.remove('minimized');
-    }
-    // Minimize only when scrolling down past threshold
-    else if (scrollDirection === 'down' && 
-             currentScrollY > TOP_THRESHOLD &&
-             Math.abs(currentScrollY - lastScrollY) > SCROLL_DELTA) {
-        header.classList.add('minimized');
-    }
-    // Show when scrolling up with significant delta
-    else if (scrollDirection === 'up' && 
-             Math.abs(currentScrollY - lastScrollY) > SCROLL_DELTA) {
-        header.classList.remove('minimized');
-    }
+            // Function to update header state (shrink/expand)
+            function updateHeaderState() {
+                if ($(document).scrollTop() > scrollThreshold) {
+                    header.addClass('minimized');
+                } else {
+                    header.removeClass('minimized');
+                }
+            }
+            
+            // Throttled scroll handler using requestAnimationFrame for smoothness
+            function throttledScroll() {
+                if (!isThrottled) {
+                    window.requestAnimationFrame(() => {
+                        updateHeaderState();
+                        isThrottled = false;
+                    });
+                    isThrottled = true;
+                }
+            }
+            
+            // Event listeners
+            $(window).on('scroll', throttledScroll);
+            
+            // Adjust body padding on window resize
+            $(window).on('resize', adjustBodyPadding);
 
-    lastScrollY = currentScrollY;
-}
+            // Initial checks on page load
+            adjustBodyPadding(); // Set initial padding
+            updateHeaderState(); // Set initial header state based on current scroll position
 
-// Throttled scroll handler
-window.addEventListener('scroll', () => {
-    if (!ticking) {
-        window.requestAnimationFrame(() => {
-            updateHeaderState();
-            ticking = false;
+            // Mobile menu toggle logic
+            $('#mobile-menu-button').on('click', function() {
+                $('#mobile-menu').slideToggle();
+            });
+
+            // Hide mobile menu when a link is clicked
+            $('#mobile-menu a').on('click', function() {
+                $('#mobile-menu').slideUp();
+            });
         });
-        ticking = true;
-    }
-});
-
-// Reset header to visible when reaching top
-window.addEventListener('load', () => {
-    if (window.scrollY <= TOP_THRESHOLD) {
-        header.classList.remove('minimized');
-    }
-});
 
 // Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
