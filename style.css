@@ -117,62 +117,54 @@ th, td {
    Enhanced Minimized Header Styles
    ========================== */
 
-/* Base header styles */
-header {
-  transition: 
-    transform 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
-    box-shadow 0.4s ease,
-    padding 0.4s ease;
-  will-change: transform;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
+        /* Base header styles */
+        header {
+            transition: 
+                padding 0.4s cubic-bezier(0.22, 0.61, 0.36, 1),
+                box-shadow 0.4s ease;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
 
-/* Minimized state styles */
-header.minimized {
-  padding-top: 0.5rem !important;
-  padding-bottom: 0.5rem !important;
-  transform: translateY(0); /* Needed for smooth transition */
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  
-  /* Add subtle scaling effect for modern browsers */
-  @media (hover: hover) {
-    &:hover {
-      transform: scale(1.01);
-    }
-  }
-}
+            /* Ensures it stays above other content */
+            position: fixed; 
+            top: 0; 
+            width: 100%;
+            z-index: 50; 
+        }
 
-/* Logo scaling */
-header.minimized img {
-  width: 32px !important;
-  height: 32px !important;
-  transition: transform 0.3s ease;
-}
+        /* Minimized state styles */
+        header.minimized {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
 
-/* Text scaling with smooth transition */
-header.minimized h1 {
-  font-size: 1.25rem !important;
-  transition: 
-    font-size 0.4s cubic-bezier(0.33, 1, 0.68, 1),
-    letter-spacing 0.4s ease;
-  letter-spacing: -0.02em;
-}
+        /* Logo scaling */
+        header.minimized .league-header-logo {
+            width: 32px !important;
+            height: 32px !important;
+        }
 
-/* Optional: Add animation to navigation items */
-header.minimized nav a {
-  transform: scale(0.95);
-  transition: transform 0.3s ease;
-}
+        /* Text scaling with smooth transition */
+        header.minimized #leagueNameHeader {
+            font-size: 1.5rem !important; 
+            transition: 
+                font-size 0.4s cubic-bezier(0.33, 1, 0.68, 1),
+                letter-spacing 0.4s ease;
+            letter-spacing: -0.02em;
+        }
 
-/* Touch-friendly active states */
-header.minimized:active {
-  transform: scale(0.98);
-}
+        /* Optional: Add animation to navigation items */
+        header.minimized nav a {
+            font-size: 0.875rem; 
+            padding-top: 0.5rem; 
+            padding-bottom: 0.5rem;
+            transition: font-size 0.3s ease, padding 0.3s ease;
+        }
 
-/* Maintain accessibility during scaling */
-header.minimized * {
-  transform: translateZ(0);
-}
+        /* Touch-friendly active states for the header */
+        header:active {
+            transform: scale(0.99); 
+        }
 
 /* Tab styles */
 .tab-container {
