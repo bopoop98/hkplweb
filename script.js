@@ -575,7 +575,7 @@ function setupFirestoreListeners() {
 
     // Listener for Teams - MODIFIED PATH FOR LEAGUE STANDINGS
     // Now fetching from '/public/hkplweb/year/2023/teams' for league standings.
-    const teamsPathForStandings = `public/${appId}/year/2023/teams`;
+    const teamsPathForStandings = `artifacts/${projectId}/public/data/leagues/hkpl/teams`;
     onSnapshot(collection(db, teamsPathForStandings), (snapshot) => {
         teamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         console.log("Teams data updated (for standings):", teamsData);
