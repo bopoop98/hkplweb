@@ -66,7 +66,7 @@ const firebaseConfig = {
     appId: "1:1774261075:web:cc26aa5d553dfd38ef87a6",
     measurementId: "G-XXXXXXXXXX"
 };
-const appId = "hkplweb"; // Use this consistent appId for paths
+const projectId = firebaseConfig.projectId; // Use this consistent ID
 
 // Initialize Firebase
 let app;
@@ -280,7 +280,7 @@ function showFullNewsArticle(newsId) {
     const newsDetailContent = document.getElementById('news-detail-content');
     newsDetailContent.classList.add('hidden'); // Hide content while loading
 
-    const newsDocRef = doc(db, `artifacts/${appId}/public/data/leagues/hkpl/news`, newsId);
+    const newsDocRef = doc(db, `artifacts/${projectId}/public/data/leagues/hkpl/news`, newsId);
     getDoc(newsDocRef).then((docSnap) => {
         document.getElementById('loading-news').classList.add('hidden'); // Hide loading
 
@@ -344,7 +344,7 @@ function renderMatches(matches, type = 'all') {
     }
     
     loadingDiv.classList.add('hidden');
-    container.innerHTML = '';
+    container.innerHTML = ''; // Clear existing content
     if (!matches || matches.length === 0) {
         noMatchesDiv.classList.remove('hidden');
         return;
@@ -366,29 +366,16 @@ function renderMatches(matches, type = 'all') {
         acc[date].push(match);
         return acc;
     }, {});
+    
     // Render grouped matches
+    let allMatchesHtml = '';
     for (const date in groupedMatches) {
-        const dateHeader = document.createElement('h3');
-        dateHeader.className = 'text-lg font-medium text-gray-600 mt-8 mb-4 pl-2 border-l-4 border-indigo-500';
-        dateHeader.textContent = date;
-        container.appendChild(dateHeader);
+        allMatchesHtml += `<h3 class="text-lg font-medium text-gray-600 mt-8 mb-4 pl-2 border-l-4 border-indigo-500">${date}</h3>`;
         groupedMatches[date].forEach(match => {
-            // 1. Define 'matchCardHtml' variable to store the generated HTML
-            const matchCardHtml = generateMatchCardHTML(match); 
-            
-            // 2. Create a new div element to hold the match card HTML
-            const matchElement = document.createElement('div');
-            
-            // 3. Assign the generated HTML string to the innerHTML of the new div
-            matchElement.innerHTML = matchCardHtml;
-            
-            // 4. Your console log will now correctly reference 'matchCardHtml'
-            console.log("Generated HTML for match:", matchCardHtml); 
-            
-            // 5. Append the entire 'matchElement' (the new div containing the card) to the container
-            container.appendChild(matchElement); 
+            allMatchesHtml += generateMatchCardHTML(match);
         });
     }
+    container.innerHTML = allMatchesHtml; // Append once
 }
 
 function generateMatchCardHTML(match) {
@@ -549,24 +536,24 @@ async function signInAndSetupListeners() {
         setLogLevel('debug');
 
         setupFirestoreListeners();
-        console.log("Firebase initialized and Firestore listeners set up for public data access.");
+        // console.log("Firebase initialized and Firestore listeners set up for public data access."); // Removed debug log
 
     } catch (error) {
         console.error("Firebase initialization error:", error);
-        document.body.innerHTML = `<div class="p-4 text-red-500">Error initializing Firebase. Please check console. AppId: ${appId}</div>`;
+        document.body.innerHTML = `<div class="p-4 text-red-500">Error initializing Firebase. Please check console. AppId: ${projectId}</div>`;
     }
 }
 
 function setupFirestoreListeners() {
     // Listener for League Details (e.g., LogoUrl)
-    const leagueDetailsPath = `artifacts/${appId}/public/data/leagues/hkpl`;
+    const leagueDetailsPath = `artifacts/${projectId}/public/data/leagues/hkpl`;
     onSnapshot(doc(db, leagueDetailsPath), (docSnap) => {
         if (docSnap.exists()) {
             leagueDetails = { id: docSnap.id, ...docSnap.data() };
-            console.log("League details updated:", leagueDetails);
+            // console.log("League details updated:", leagueDetails); // Removed debug log
             renderLeagueHeader();
         } else {
-            console.log("No such league details document!");
+            // console.log("No such league details document!"); // Removed debug log
             leagueDetails = {};
             renderLeagueHeader();
         }
@@ -574,29 +561,30 @@ function setupFirestoreListeners() {
     //## Modified Team Data Fetching
 
     // Listener for Teams - MODIFIED PATH FOR LEAGUE STANDINGS
-    // Now fetching from '/public/hkplweb/year/2023/teams' for league standings.
+    // Now fetching from '/public/hkplweb/year/{currentYear}/teams' for league standings.
+    const currentYear = new Date().getFullYear().toString(); // Get current year dynamically
     const teamsPathForStandings = `artifacts/${projectId}/public/data/leagues/hkpl/teams`;
     onSnapshot(collection(db, teamsPathForStandings), (snapshot) => {
         teamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("Teams data updated (for standings):", teamsData);
+        // console.log("Teams data updated (for standings):", teamsData); // Removed debug log
         renderLeagueStandings(teamsData);
     }, (error) => console.error("Error fetching teams for league standings:", error));
     // Listener for Matches
-    const matchesPath = `artifacts/${appId}/public/data/leagues/hkpl/matches`;
+    const matchesPath = `artifacts/${projectId}/public/data/leagues/hkpl/matches`;
     onSnapshot(collection(db, matchesPath), (snapshot) => {
         allMatches = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("Matches data updated:", allMatches);
+        // console.log("Matches data updated:", allMatches); // Removed debug log
 
         // Get the element directly here for the check
         const matchesContainerElement = document.getElementById('matches-container');
-        console.log("matches-container status before filterMatches call in setupFirestoreListeners:", matchesContainerElement);
+        // console.log("matches-container status before filterMatches call in setupFirestoreListeners:", matchesContainerElement); // Removed debug log
 
         if (matchesContainerElement) {
             // If the element exists, call filterMatches directly
             filterMatches('all');
         } else {
             // If not ready, log a message and wait briefly to retry
-            console.warn("matches-container not found on initial Firestore snapshot. Retrying in 100ms...");
+            // console.warn("matches-container not found on initial Firestore snapshot. Retrying in 100ms..."); // Removed debug log
             setTimeout(() => {
                 // After delay, re-check and call filterMatches if still null
                 if (document.getElementById('matches-container')) {
@@ -610,28 +598,28 @@ function setupFirestoreListeners() {
 
 
     // Listener for News
-    const newsPath = `artifacts/${appId}/public/data/leagues/hkpl/news`; // Path to your news collection
+    const newsPath = `artifacts/${projectId}/public/data/leagues/hkpl/news`; // Path to your news collection
     onSnapshot(collection(db, newsPath), (snapshot) => {
         const newsItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("News data updated:", newsItems); // For debugging
+        // console.log("News data updated:", newsItems); // Removed debug log
         renderNews(newsItems); // Call the renderNews function with the fetched data
     }, (error) => console.error("Error fetching news:", error));
 
     // Listener for Players (Top Scorers) - UNCHANGED PATH
-    const playersPath = `artifacts/${appId}/public/data/leagues/hkpl/players`;
+    const playersPath = `artifacts/${projectId}/public/data/leagues/hkpl/players`;
     onSnapshot(collection(db, playersPath), (snapshot) => {
         const players = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        console.log("Players data updated:", players);
+        // console.log("Players data updated:", players); // Removed debug log
         renderTopScorers(players);
     }, (error) => console.error("Error fetching players:", error));
 
     // Listener for Settings (optional, if needed for UI) - UNCHANGED PATH
-    const settingsPath = `artifacts/${appId}/public/data/leagues/hkpl/settings/config`;
+    const settingsPath = `artifacts/${projectId}/public/data/leagues/hkpl/settings/config`;
     onSnapshot(doc(db, settingsPath), (docSnap) => {
         if (docSnap.exists()) {
-            console.log("Settings updated:", docSnap.data());
+            // console.log("Settings updated:", docSnap.data()); // Removed debug log
         } else {
-            console.log("No such settings document!");
+            // console.log("No such settings document!"); // Removed debug log
         }
     }, (error) => console.error("Error fetching settings:", error));
 }
