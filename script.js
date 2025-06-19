@@ -1,56 +1,39 @@
 // ==========================
-// Enhanced Scroll-Based Header Minimization
+// Enhanced Scroll-Based Header Minimization (No jQuery)
 // ==========================
 
-        $(document).ready(function() {
-            const header = $('#main-header');
-            const scrollThreshold = 50; // Pixels to scroll before shrinking
-            let isThrottled = false;
-            
-            // Function to adjust padding-top of body to prevent content 
-            function adjustBodyPadding() {
-                $('body').css('padding-top', header.outerHeight() + 'px');
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    const header = document.getElementById('main-header');
+    const scrollThreshold = 50;
 
-            // Function to update header state (shrink/expand)
-            function updateHeaderState() {
-                if ($(document).scrollTop() > scrollThreshold) {
-                    header.addClass('minimized');
-                } else {
-                    header.removeClass('minimized');
-                }
-            }
-            
-            // Throttled scroll handler using requestAnimationFrame for smoothness
-            function throttledScroll() {
-                if (!isThrottled) {
-                    window.requestAnimationFrame(() => {
-                        updateHeaderState();
-                        isThrottled = false;
-                    });
-                    isThrottled = true;
-                }
-            }
-            
-            // Event listeners
-            $(window).on('scroll', throttledScroll);
-            // Adjust body padding on window resize
-            $(window).on('resize', adjustBodyPadding);
-            // Initial checks on page load
-            adjustBodyPadding();
-            // Set initial padding
-            updateHeaderState();
-            // Set initial header state based on current scroll position
+    function adjustBodyPadding() {
+        document.body.style.paddingTop = header.offsetHeight + 'px';
+    }
 
-            // Mobile menu toggle logic
-            $('#mobile-menu-button').on('click', function() {
-                $('#mobile-menu').slideToggle();
+    function updateHeaderState() {
+        if (window.scrollY > scrollThreshold) {
+            header.classList.add('minimized');
+        } else {
+            header.classList.remove('minimized');
+        }
+    }
+
+    let isThrottled = false;
+    function throttledScroll() {
+        if (!isThrottled) {
+            window.requestAnimationFrame(() => {
+                updateHeaderState();
+                isThrottled = false;
             });
-            // Hide mobile menu when a link is clicked
-            $('#mobile-menu a').on('click', function() {
-                $('#mobile-menu').slideUp();
-            });
-        });
+            isThrottled = true;
+        }
+    }
+
+    window.addEventListener('scroll', throttledScroll);
+    window.addEventListener('resize', adjustBodyPadding);
+    adjustBodyPadding();
+    updateHeaderState();
+});
 
 // Firebase SDKs
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -105,36 +88,29 @@ function filterMatches(tab) {
     const oneDayInMs = 24 * 60 * 60 * 1000;
     const twelveHoursAgo = new Date(now.getTime() - twelveHoursInMs);
     const oneDayAgo = new Date(now.getTime() - oneDayInMs);
+    let matches = [];
     switch(tab) {
-        case 'all':
-            filteredMatches = [...allMatches];
+        case 'all': {
+            // Get up to 1 ongoing, 3 upcoming, 3 finished (in that order)
+            const ongoing = allMatches.filter(m => m.status === 'ongoing').slice(0, 1);
+            const upcoming = allMatches.filter(m => m.status === 'upcoming').slice(0, 3);
+            const finished = allMatches.filter(m => m.status === 'finished').slice(0, 3);
+            matches = [...ongoing, ...upcoming, ...finished];
             break;
-            
+        }
         case 'upcoming':
-            filteredMatches = allMatches.filter(m => m.status === 'upcoming');
+            matches = allMatches.filter(m => m.status === 'upcoming').slice(0, 6);
             break;
-            
         case 'ongoing':
-            filteredMatches = allMatches.filter(m => m.status === 'ongoing');
+            matches = allMatches.filter(m => m.status === 'ongoing').slice(0, 1);
             break;
-            
         case 'finished':
-            filteredMatches = allMatches.filter(m => {
-                if (m.status !== 'finished') return false;
-                const [day, month, year] = m.date.split('-'); // This will now work as m.date is "DD-MM-YYYY"
-                const formattedDate = `${year}-${month}-${day}`;
-                const matchDateTimeStr = `${formattedDate}T${m.time || '00:00:00'}`;
-                const matchDateTime = new Date(matchDateTimeStr);
-
-                if (isNaN(matchDateTime.getTime())) return false;
-                return matchDateTime < twelveHoursAgo && matchDateTime >= oneDayAgo;
-            });
+            matches = allMatches.filter(m => m.status === 'finished').slice(0, 6);
             break;
-            
         default:
-            filteredMatches = [...allMatches];
+            matches = [...allMatches];
     }
-    
+    filteredMatches = matches;
     renderMatches(filteredMatches);
 }
 
@@ -329,68 +305,55 @@ function renderMatches(matches, type = 'all') {
     const noMatchesDiv = document.getElementById('no-matches');
     const loadingDiv = document.getElementById('loading-matches');
 
-    // Safeguard against null elements - this is the critical part
-    if (!container) {
-        console.error("Error: 'matches-container' element is null. Cannot render matches.");
-        return; // Exit the function if container is null
-    }
-    if (!noMatchesDiv) {
-        console.error("Error: 'no-matches' element is null. Some UI elements may not function correctly.");
-        // Do not return, as container might still be valid for rendering matches
-    }
-    if (!loadingDiv) {
-        console.error("Error: 'loading-matches' element is null. Some UI elements may not function correctly.");
-        // Do not return
-    }
-    
+    if (!container) return;
+    if (!noMatchesDiv) return;
+    if (!loadingDiv) return;
+
     loadingDiv.classList.add('hidden');
-    container.innerHTML = ''; // Clear existing content
+    container.innerHTML = '';
     if (!matches || matches.length === 0) {
         noMatchesDiv.classList.remove('hidden');
         return;
     }
-    
     noMatchesDiv.classList.add('hidden');
-    
+
     // Group matches by date
     const groupedMatches = matches.reduce((acc, match) => {
         const [day, month, year] = match.date.split('-');
         const formattedDateString = `${year}-${month}-${day}`;
-        const date = new Date(formattedDateString).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+        const dateObj = new Date(formattedDateString);
+        const date = dateObj.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
         });
-        
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(match);
+        const weekday = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+        const dateWithWeekday = `${date} (${weekday})`;
+        if (!acc[dateWithWeekday]) acc[dateWithWeekday] = [];
+        acc[dateWithWeekday].push(match);
         return acc;
     }, {});
-    
-    // Render grouped matches
+
+    // Render grouped matches: one material-card per day
     let allMatchesHtml = '';
     for (const date in groupedMatches) {
-        allMatchesHtml += `<h3 class="text-lg font-medium text-gray-600 mt-8 mb-4 pl-2 border-l-4 border-indigo-500">${date}</h3>`;
-        groupedMatches[date].forEach(match => {
-            allMatchesHtml += generateMatchCardHTML(match);
-        });
+        allMatchesHtml += `<div class="material-card p-4">
+            <h3 class="text-lg font-medium text-gray-600 mb-2 pl-2 border-l-4 border-indigo-500">${date}</h3>
+            <div class="space-y-2">
+                ${groupedMatches[date].map(match => generateMatchCardHTML(match)).join('')}
+            </div>
+        </div>`;
     }
-    container.innerHTML = allMatchesHtml; // Append once
+    container.innerHTML = allMatchesHtml;
 }
 
 function generateMatchCardHTML(match) {
     const homeTeam = getTeamDataById(match.homeTeamId);
     const awayTeam = getTeamDataById(match.awayTeamId);
     if (!homeTeam || !awayTeam) {
-        console.warn("Team data missing for match:", match.id, "Home:", match.homeTeamId, "Away:", match.awayTeamId);
         return `<div class="material-card p-4 mb-3 text-red-500">Error: Team data missing for this match.</div>`;
     }
 
-    // Ensure date is correctly parsed for display
-	const [day, month, year] = match.date.split('-');
-    // This will also work correctly
-    const formattedDateString = `${year}-${month}-${day}`;
-    const matchDateStr = new Date(formattedDateString).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     let statusBadge = '';
     let scoreOrVs = '';
 
@@ -413,9 +376,9 @@ function generateMatchCardHTML(match) {
     }
 
     return `
-        <div class="material-card p-4 mb-3">
+        <div class="p-2 border-b last:border-b-0">
             <div class="flex items-center justify-between mb-1.5">
-                <span class="text-xs text-gray-500">${match.status === 'upcoming' ? matchDateStr + ' - ' : ''}${match.time}</span>
+                <span class="text-xs text-gray-500">${match.time}</span>
                 ${statusBadge}
             </div>
             <div class="flex items-center justify-around text-center">
@@ -533,11 +496,9 @@ async function signInAndSetupListeners() {
         app = initializeApp(firebaseConfig);
         db = getFirestore(app);
         auth = getAuth(app);
-        setLogLevel('debug');
+        // setLogLevel('debug'); // Removed for production
 
         setupFirestoreListeners();
-        // console.log("Firebase initialized and Firestore listeners set up for public data access."); // Removed debug log
-
     } catch (error) {
         console.error("Firebase initialization error:", error);
         document.body.innerHTML = `<div class="p-4 text-red-500">Error initializing Firebase. Please check console. AppId: ${projectId}</div>`;
@@ -550,10 +511,8 @@ function setupFirestoreListeners() {
     onSnapshot(doc(db, leagueDetailsPath), (docSnap) => {
         if (docSnap.exists()) {
             leagueDetails = { id: docSnap.id, ...docSnap.data() };
-            // console.log("League details updated:", leagueDetails); // Removed debug log
             renderLeagueHeader();
         } else {
-            // console.log("No such league details document!"); // Removed debug log
             leagueDetails = {};
             renderLeagueHeader();
         }
@@ -566,7 +525,6 @@ function setupFirestoreListeners() {
     const teamsPathForStandings = `artifacts/${projectId}/public/data/leagues/hkpl/teams`;
     onSnapshot(collection(db, teamsPathForStandings), (snapshot) => {
         teamsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        // console.log("Teams data updated (for standings):", teamsData); // Removed debug log
         renderLeagueStandings(teamsData);
     }, (error) => console.error("Error fetching teams for league standings:", error));
     // Listener for Matches
@@ -631,12 +589,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     signInAndSetupListeners();
 
-    // Mobile menu toggle
+    // Mobile menu toggle (fix for mobile)
     const menuButton = document.getElementById('mobile-menu-button');
     const mobileMenu = document.getElementById('mobile-menu');
-    menuButton.addEventListener('click', () => {
-        mobileMenu.classList.toggle('hidden');
-    });
+    if (menuButton && mobileMenu) {
+        menuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        // Hide menu when a link is clicked
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    }
 
     // Back to News button listener
     document.getElementById('back-to-news-btn').addEventListener('click', hideFullNewsArticle);
