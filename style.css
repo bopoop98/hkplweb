@@ -163,10 +163,6 @@ th, td {
             transition: font-size 0.3s ease, padding 0.3s ease;
         }
 
-        /* Touch-friendly active states for the header */
-        header:active {
-            transform: scale(0.99); 
-        }
 
 /* Tab styles */
 .tab-container {
