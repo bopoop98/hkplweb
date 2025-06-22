@@ -473,6 +473,7 @@ function renderTopScorers(players) {
     tbody.closest('.table-container').classList.remove('hidden');
 
     const sortedScorers = players
+        .sort((a, b) => (b.goals || 0) - (a.goals || 0) || (a.matchesPlayed || 0) - (b.matchesPlayed || 0));
         .filter(p => (p.goals || 0) > 0)
     if (sortedScorers.length === 0) {
         noTopScorersDiv.classList.remove('hidden');
