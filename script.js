@@ -411,11 +411,26 @@ function renderLeagueStandings(teams) {
         return;
     }
 
+
     const standings = teams.map(team => {
         const gd = (team.gf || 0) - (team.ga || 0);
         const pts = (team.won || 0) * 3 + (team.draw || 0);
         return { ...team, gd, pts };
-    }).sort((a, b) => b.pts - a.pts || b.gd - a.gd || b.gf - a.gf || a.name.localeCompare(b.name));
+    }).sort((a, b) => {
+        // Sort by points, then GD, then red card, then yellow card, then GF, then GA, then name
+        if (b.pts !== a.pts) return b.pts - a.pts;
+        if (b.gd !== a.gd) return b.gd - a.gd;
+        // Red card: fewer is better
+        if ((a.redCard || 0) !== (b.redCard || 0)) return (a.redCard || 0) - (b.redCard || 0);
+        // Yellow card: fewer is better
+        if ((a.yellowCard || 0) !== (b.yellowCard || 0)) return (a.yellowCard || 0) - (b.yellowCard || 0);
+        // GF: more is better
+        if ((b.gf || 0) !== (a.gf || 0)) return (b.gf || 0) - (a.gf || 0);
+        // GA: fewer is better
+        if ((a.ga || 0) !== (b.ga || 0)) return (a.ga || 0) - (b.ga || 0);
+        // Name: alphabetical
+        return a.name.localeCompare(b.name);
+    });
     let rowsHTML = '';
     standings.forEach((team, index) => {
         rowsHTML += `
