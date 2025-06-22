@@ -448,3 +448,23 @@ div#news-container.news-grid {
 .news-card.cursor-pointer {
     cursor: pointer;
 }
+
+/* Mobile-specific styles for match score and card layout fix in mobile view */
+@media (max-width: 600px) {
+  .match-score {
+    display: inline-block;
+    width: auto;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    padding: 0.2rem 0.6rem;
+    background-color: #e8eaf6;
+    border-radius: 8px;
+    margin: 0 0.5rem;
+    vertical-align: middle;
+  }
+  .p-2.border-b.last\:border-b-0.cursor-pointer .flex.items-center.justify-around.text-center {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.5rem;
+  }
+}
