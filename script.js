@@ -430,6 +430,8 @@ function renderLeagueStandings(teams) {
                 <td class="px-2 py-4 text-sm text-gray-600">${team.gf || 0}</td>
                 <td class="px-2 py-4 text-sm text-gray-600">${team.ga || 0}</td>
                 <td class="px-2 py-4 text-sm text-gray-600">${team.gd > 0 ? '+' : ''}${team.gd}</td>
+                <td class="px-2 py-4 text-sm text-red-600">${team.redCard || 0}</td>
+                <td class="px-2 py-4 text-sm text-yellow-500">${team.yellowCard || 0}</td>
                 <td class="px-2 py-4 text-sm font-bold text-indigo-700">${team.pts}</td>
             </tr>
         `;
