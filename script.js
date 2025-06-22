@@ -474,7 +474,6 @@ function renderTopScorers(players) {
 
     const sortedScorers = players
         .filter(p => (p.goals || 0) > 0)
-        .sort((a, b) => (b.goals || 0) - (a.goals || 0) || (b.assists || 0) - (a.assists || 0) || (a.matchesPlayed || 0) - (b.matchesPlayed || 0));
     if (sortedScorers.length === 0) {
         noTopScorersDiv.classList.remove('hidden');
         tbody.closest('.table-container').classList.add('hidden');
@@ -483,11 +482,21 @@ function renderTopScorers(players) {
 
 
     let rowsHTML = '';
+    let lastGoals = null;
+    let lastRank = 0;
+    let displayRank = 0;
     sortedScorers.forEach((scorer, index) => {
+        if (scorer.goals !== lastGoals) {
+            displayRank = index + 1;
+            lastGoals = scorer.goals;
+            lastRank = displayRank;
+        } else {
+            displayRank = lastRank;
+        }
         const team = getTeamDataById(scorer.team_id);
         rowsHTML += `
             <tr class="${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-indigo-50 transition-colors">
-                <td class="px-4 py-3 text-sm font-medium text-gray-700">${index + 1}</td>
+                <td class="px-4 py-3 text-sm font-medium text-gray-700">${displayRank}</td>
                 <td class="px-4 py-3 text-sm font-medium text-gray-900">
                     <div class="flex items-center space-x-2.5">
                         <img src="${scorer.imageUrl || defaultPlayerImgUrl}" alt="${scorer.name}" class="player-pic-sm" onerror="this.src='${defaultPlayerImgUrl}'">
@@ -499,7 +508,6 @@ function renderTopScorers(players) {
                 </td>
                 <td class="px-4 py-3 text-sm text-gray-600 truncate" style="max-width: 150px;" title="${team ? team.name : 'N/A'}">${team ? team.name : 'N/A'}</td>
                 <td class="px-4 py-3 text-sm font-semibold text-indigo-700">${scorer.goals || 0}</td>
-                <td class="px-4 py-3 text-sm text-gray-600">${scorer.assists || 0}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">${scorer.matchesPlayed || 0}</td>
             </tr>
         `;
