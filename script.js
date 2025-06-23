@@ -91,11 +91,26 @@ function filterMatches(tab) {
     let matches = [];
     switch(tab) {
         case 'all': {
-            // Get up to 1 ongoing, 3 upcoming, 3 finished (in that order)
-            const ongoing = allMatches.filter(m => m.status === 'ongoing').slice(0, 1);
-            const upcoming = allMatches.filter(m => m.status === 'upcoming').slice(0, 3);
-            const finished = allMatches.filter(m => m.status === 'finished').slice(0, 3);
-            matches = [...ongoing, ...upcoming, ...finished];
+            // Show all matches for Saturday and Sunday (current week)
+            const today = new Date();
+            // Find the most recent Saturday
+            const dayOfWeek = today.getDay(); // 0=Sun, 6=Sat
+            const saturday = new Date(today);
+            saturday.setDate(today.getDate() - ((dayOfWeek + 1) % 7));
+            saturday.setHours(0,0,0,0);
+            // Sunday is the next day
+            const sunday = new Date(saturday);
+            sunday.setDate(saturday.getDate() + 1);
+            sunday.setHours(0,0,0,0);
+            // Get all matches for Saturday and Sunday
+            matches = allMatches.filter(m => {
+                if (!m.date) return false;
+                // m.date is in dd-mm-yyyy
+                const [day, month, year] = m.date.split('-');
+                const matchDate = new Date(`${year}-${month}-${day}`);
+                matchDate.setHours(0,0,0,0);
+                return (matchDate.getTime() === saturday.getTime() || matchDate.getTime() === sunday.getTime());
+            });
             break;
         }
         case 'upcoming':
