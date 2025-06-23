@@ -453,7 +453,6 @@ function renderLeagueStandings(teams) {
     });
     tbody.innerHTML = rowsHTML;
 }
-
 function renderTopScorers(players) {
     const tbody = document.getElementById('top-scorers-table-body');
     const noTopScorersDiv = document.getElementById('no-top-scorers');
@@ -480,6 +479,7 @@ function renderTopScorers(players) {
         tbody.closest('.table-container').classList.add('hidden');
         return;
     }
+
 
     let rowsHTML = '';
     let lastGoals = null;
@@ -514,7 +514,6 @@ function renderTopScorers(players) {
     });
     tbody.innerHTML = rowsHTML;
 }
-
 // --- Firebase Initialization and Data Listeners ---
 async function signInAndSetupListeners() {
     try {
