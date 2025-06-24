@@ -1,3 +1,7 @@
-"scripts": {
-  "build": "node generate-config.js"
+{
+  "name": "hkpl-revise",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node generate-config.js"
+  }
 }
