@@ -1,4 +1,6 @@
+// generate-config.js
 const fs = require('fs');
+const path = require('path');
 
 function escape(str) {
   return (str || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
@@ -36,8 +38,9 @@ const firebaseConfig = {
 export default firebaseConfig;
 `;
 
-fs.writeFileSync('config.js', config);
-console.log('config.js generated!');
+const outputPath = path.join(__dirname, 'public', 'config.js');
+fs.writeFileSync(outputPath, config);
+console.log('config.js generated in /public!');
 if (missing) {
   process.exit(1);
 }
