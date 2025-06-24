@@ -41,6 +41,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, collection, setLogLevel, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+
+// Define projectId from config
+const projectId = firebaseConfig.projectId;
+
 // Initialize Firebase
 let app = null;
 let db = null;
