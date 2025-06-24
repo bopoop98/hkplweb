@@ -40,6 +40,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, collection, setLogLevel, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+// Initialize Firebase
+let app = null;
+let db = null;
+let auth = null;
+
 async function initializeFirebase() {
   try {
     // Fetch the configuration from our Vercel serverless function
@@ -69,11 +74,6 @@ async function initializeFirebase() {
 }
 // Call the function to start the process when the script loads
 initializeFirebase();
-
-// Initialize Firebase
-let app;
-let db;
-let auth;
 
 // Global matches storage
 let allMatches = [];
