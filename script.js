@@ -39,17 +39,36 @@ document.addEventListener('DOMContentLoaded', function() {
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 import { getFirestore, doc, onSnapshot, collection, setLogLevel, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-// Firebase config and App ID (now hardcoded for GitHub Pages)
-const firebaseConfig = {
-    apiKey: "AIzaSyDikFHg3TNUng-I9WgeTWXbO29SKxWNLZE",
-    authDomain: "hkplweb.firebaseapp.com",
-    projectId: "hkplweb",
-    storageBucket: "hkplweb.firebasestorage.app",
-    messagingSenderId: "1774261075",
-    appId: "1:1774261075:web:cc26aa5d553dfd38ef87a6",
-    measurementId: "G-XXXXXXXXXX"
-};
-const projectId = firebaseConfig.projectId; // Use this consistent ID
+
+async function initializeFirebase() {
+  try {
+    // Fetch the configuration from our Vercel serverless function
+    const response = await fetch('/api/config');
+    if (!response.ok) {
+      throw new Error('Failed to fetch Firebase config');
+    }
+    const firebaseConfig = await response.json();
+
+    // Now that we have the config, initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    console.log('Firebase has been initialized successfully!');
+
+    // You can now use the 'db' object to interact with Firestore
+    // Example: Get data from a 'users' collection
+    const querySnapshot = await db.collection("users").get();
+    querySnapshot.forEach((doc) => {
+      console.log(`${doc.id} =>`, doc.data());
+    });
+
+  } catch (error) {
+    console.error("Error initializing Firebase:", error);
+    // Handle the error appropriately in your UI
+  }
+}
+// Call the function to start the process when the script loads
+initializeFirebase();
 
 // Initialize Firebase
 let app;
